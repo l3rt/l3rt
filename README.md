@@ -96,6 +96,6 @@ rule {
 
 `./gradlew application:jar `
 
-`CONFIG=~/monalert-conf.json java -jar ./l3rt-0.1.0.jar`
+`CONFIG=~/conf.json java -jar ./l3rt-0.1.0.jar`
 
 NOTE: l3rt requires >= Java 8
