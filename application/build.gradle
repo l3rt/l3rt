@@ -1,0 +1,18 @@
+dependencies {
+    compile project(":core")
+    compile project(":elasticsearch-input")
+    compile ("org.reflections:reflections:0.9.11")
+}
+
+ext.mainClassName = "lert.Application"
+
+jar {
+    baseName = 'l3rt'
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

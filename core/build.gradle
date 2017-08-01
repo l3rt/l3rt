@@ -1,0 +1,9 @@
+dependencies {
+    compile("com.fasterxml.jackson.module:jackson-module-scala_2.12:2.8.9",
+            "org.codehaus.groovy:groovy-all:2.4.12",
+            "io.evanwong.oss:hipchat-java:0.4.3",
+            "org.codehaus.groovy:groovy-all:2.4.12",
+            "com.sun.mail:javax.mail:1.5.6")
+
+    testCompile("org.jvnet.mock-javamail:mock-javamail:1.9")
+}

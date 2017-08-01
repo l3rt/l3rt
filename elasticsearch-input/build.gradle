@@ -1,0 +1,5 @@
+ dependencies {
+    compile project(":core")
+    compile ("org.elasticsearch.client:rest:5.5.0")
+    testCompile project(":core").sourceSets.test.output
+}

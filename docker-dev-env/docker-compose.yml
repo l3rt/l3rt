@@ -1,0 +1,9 @@
+elasticsearch:
+  image: elasticsearch:2.4.4
+  container_name: monalert_elasticsearch
+  command: elasticsearch --http.cors.enabled=true --script.inline=on --script.indexed=on --cluster.name=monalert --http.cors.allow-origin="*"
+  volumes:
+    - ./esdata:/usr/share/elasticsearch/data
+  ports:
+    - "9200:9200"
+    - "9300:9300"

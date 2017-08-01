@@ -1,0 +1,5 @@
+rootProject.name = 'monalert'
+include 'core'
+include 'elasticsearch-input'
+include 'application'
+

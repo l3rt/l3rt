@@ -1,0 +1,23 @@
+group 'lert'
+
+subprojects {
+    apply plugin: 'scala'
+    sourceCompatibility = 1.8
+    repositories {
+        mavenCentral()
+    }
+
+    sourceSets.main.scala.srcDir "src/main/java"
+    sourceSets.main.java.srcDirs = []
+
+    dependencies {
+        compile("org.scala-lang:scala-library:2.12.1",
+                "ch.qos.logback:logback-classic:1.2.3",
+                "com.typesafe.scala-logging:scala-logging_2.12:3.7.1",
+                "net.codingwell:scala-guice_2.12:4.1.0"
+        )
+        testCompile("org.scalatest:scalatest_2.12:3.0.3",
+                "org.mockito:mockito-all:1.10.19",
+                "junit:junit:4.12")
+    }
+}
