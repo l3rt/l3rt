@@ -98,4 +98,20 @@ rule {
 
 `CONFIG=~/conf.json java -jar ./l3rt-0.1.0.jar`
 
+### or Docker
+
+`docker run -it -v ~/conf.json:/l3rt/config/config.json -v ~/rules:/l3rt/rules dimafeng/l3rt:0.1.0`
+
+Put your rules inside `~/rules` and use them in the `config.json` as follows:
+
+```json
+{
+...
+  "rules": [
+         "/l3rt/rules/exampleRule.groovy"
+  ]
+...
+}
+```
+
 NOTE: l3rt requires >= Java 8
