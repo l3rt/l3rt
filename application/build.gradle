@@ -1,3 +1,15 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
+    }
+}
+
+apply plugin: 'docker'
+
 dependencies {
     compile project(":core")
     compile project(":elasticsearch-input")
@@ -16,3 +28,15 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
+task buildDocker(type: Docker) {
+    println(jar.archivePath)
+    baseImage = 'java:8u111-jre'
+    setEnvironment('CONFIG', '/l3rt/config/config.json')
+    entryPoint(['java','-server','-jar','/opt/l3rt.jar'])
+    push = false
+    applicationName = 'lert'
+    addFile jar.archivePath, '/opt/l3rt.jar'
+    tag = "dimafeng/l3rt"
+}
+buildDocker.dependsOn jar
