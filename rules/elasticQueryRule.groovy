@@ -17,7 +17,7 @@ rule {
 
     reaction { messages ->
         messages.each {
-            log(it.data.'@timestamp')
+            log(it.data.toString())
         }
     }
 }

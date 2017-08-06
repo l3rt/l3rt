@@ -125,7 +125,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     TargetHelper.setInjector(injector)
     when(injector.getInstance(classOf[RuleDelegate])).thenReturn(delegate)
 
-    new GroovyReactionProcessor().process(new ByteArrayInputStream(
+    new GroovyRuleRunner().process(new ByteArrayInputStream(
       rule.getBytes()
     ))
   }

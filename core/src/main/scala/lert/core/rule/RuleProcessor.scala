@@ -7,11 +7,11 @@ import groovy.lang.{Binding, GroovyShell}
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 
-trait ReactionProcessor {
+trait RuleRunner {
   def process(script: InputStream)
 }
 
-class GroovyReactionProcessor extends ReactionProcessor {
+class GroovyRuleRunner extends RuleRunner {
   override def process(script: InputStream): Unit = {
     val bindings = new Binding() {
       //setVariable("message", JavaUtils.toJava(mes.data))

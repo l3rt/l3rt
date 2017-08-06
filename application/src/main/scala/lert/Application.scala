@@ -12,7 +12,7 @@ import lert.core.cache.{GlobalCache, GuavaCache}
 import lert.core.config._
 import lert.core.processor.Processor
 import lert.core.rule.target.TargetHelper
-import lert.core.rule.{GroovyReactionProcessor, ReactionProcessor}
+import lert.core.rule.{GroovyRuleRunner, RuleRunner}
 import lert.core.status.{FileStatusProvider, StatusProvider}
 import lert.core.{Task, TaskManager}
 import net.codingwell.scalaguice.ScalaModule
@@ -42,7 +42,7 @@ class ApplicationModule extends ScalaModule with LazyLogging {
   private val CONFIG_ENV = "CONFIG"
 
   override def configure(): Unit = {
-    bind[ReactionProcessor].to[GroovyReactionProcessor]
+    bind[RuleRunner].to[GroovyRuleRunner]
     bind[ObjectMapper].toInstance(new ObjectMapper() {
       registerModule(DefaultScalaModule)
     })
