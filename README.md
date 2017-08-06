@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/l3rt/l3rt.svg?branch=master)](https://travis-ci.org/l3rt/l3rt)
+
 # L3rt
 
 Simple alerting application. It was inspired by elastalert and the main idea is to provide users with more sophisticated rule system.
