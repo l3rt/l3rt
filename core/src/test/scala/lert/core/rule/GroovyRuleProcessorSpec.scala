@@ -14,7 +14,7 @@ import org.mockito.Mockito._
 class GroovyRuleProcessorSpec extends BaseSpec {
   it should "run the script" in {
     val processor = processorMock(Seq(AlertMessage(Map("test" -> Map("1" -> "2")))))
-    val delegate = spy(new RuleDelegate(null, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
+    val delegate = spy(new RuleDelegate(null, null, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
     runRule(
       """
         |rule {
@@ -36,7 +36,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
 
   it should "trow an exception if rule has no reaction" in {
     val processor = processorMock(Seq())
-    val delegate = spy(new RuleDelegate(null, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
+    val delegate = spy(new RuleDelegate(null, null, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
     assertThrows[IllegalStateException] {
       runRule(
         """
@@ -52,7 +52,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
 
   it should "trow an exception if rule has no name" in {
     val processor = processorMock(Seq())
-    val delegate = spy(new RuleDelegate(null, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
+    val delegate = spy(new RuleDelegate(null, null, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
     assertThrows[IllegalArgumentException] {
       runRule(
         """
@@ -71,7 +71,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
   it should "send message via hipchat" in {
     val processor = processorMock(Seq())
     val hipchatTarget = mock(classOf[HipChatTarget])
-    val delegate = spy(new RuleDelegate(hipchatTarget, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
+    val delegate = spy(new RuleDelegate(hipchatTarget, null, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
     runRule(
       """
         |rule {
@@ -91,7 +91,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
   it should "send message via email" in {
     val processor = processorMock(Seq())
     val emailTarget = mock(classOf[EmailTarget])
-    val delegate = spy(new RuleDelegate(null, emailTarget, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
+    val delegate = spy(new RuleDelegate(null, emailTarget, null, SimpleConfigProvider(Config(sources = Seq(source))), processorLoaderMock(processor)))
     runRule(
       """
         |rule {

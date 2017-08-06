@@ -14,8 +14,8 @@ import groovy.lang.Closure
 
 class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
                              emailTarget: EmailTarget,
-                             configProvider: ConfigProvider,
                              slackTarget: SlackTarget,
+                             configProvider: ConfigProvider,
                              processorLoader: ProcessorLoader) extends LazyLogging {
   @BeanProperty
   var sourceName: String = _
