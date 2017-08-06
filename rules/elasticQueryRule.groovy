@@ -7,7 +7,7 @@ rule {
                         "query": {
                              "range" : {
                                     "@timestamp" : {
-                                        "gte": {lastProcessedTimestamp}
+                                        "gt": {lastProcessedTimestamp}
                                     }
                              }
                         }

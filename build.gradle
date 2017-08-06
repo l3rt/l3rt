@@ -14,7 +14,8 @@ subprojects {
         compile("org.scala-lang:scala-library:2.12.1",
                 "ch.qos.logback:logback-classic:1.2.3",
                 "com.typesafe.scala-logging:scala-logging_2.12:3.7.1",
-                "net.codingwell:scala-guice_2.12:4.1.0"
+                "net.codingwell:scala-guice_2.12:4.1.0",
+                "org.reflections:reflections:0.9.11"
         )
         testCompile("org.scalatest:scalatest_2.12:3.0.3",
                 "org.mockito:mockito-all:1.10.19",

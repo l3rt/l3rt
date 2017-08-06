@@ -19,7 +19,7 @@ class FileStatusProvider @Inject()(objectMapper: ObjectMapper) extends StatusPro
       Some(objectMapper.readValue(Files.readAllBytes(ruleNameToPath(ruleName)), classOf[Status]))
     } catch {
       case ex: Exception =>
-        logger.error(ex.getLocalizedMessage)
+        logger.warn(s"Couldn't read previous rule's [$ruleName] status: ${ex.getLocalizedMessage}")
         None
     }
   }

@@ -30,7 +30,7 @@ class Task @Inject()(configProvider: ConfigProvider,
         .rules
         .foreach(ruleLoader.process)
     } catch {
-      case ex: Exception =>
+      case ex: Any =>
         logger.error(ex.getLocalizedMessage)
         logger.debug(ex.getLocalizedMessage, ex)
     }
