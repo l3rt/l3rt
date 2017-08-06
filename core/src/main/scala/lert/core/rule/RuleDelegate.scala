@@ -5,10 +5,9 @@ import javax.inject.Inject
 
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
-
 import lert.core.ProcessorLoader
 import lert.core.config.ConfigProvider
-import lert.core.rule.target.{EmailTarget, HipChatTarget}
+import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget}
 import lert.core.utils.JavaUtils
 import com.typesafe.scalalogging.LazyLogging
 import groovy.lang.Closure
@@ -16,6 +15,7 @@ import groovy.lang.Closure
 class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
                              emailTarget: EmailTarget,
                              configProvider: ConfigProvider,
+                             slackTarget: SlackTarget,
                              processorLoader: ProcessorLoader) extends LazyLogging {
   @BeanProperty
   var sourceName: String = _
@@ -42,6 +42,8 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
 
   def email(recipient: String, subject: String, body: String) =
     emailTarget.send(recipient, subject, body)
+
+  def slack(room: String, message: String) = slackTarget.send(room, message)
 
   def reaction(cl: Closure[Unit]): Unit = {
     reactionWasCalled = true

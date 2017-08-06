@@ -13,9 +13,12 @@ case class Config(delay: Int = 0,
 case class Source(name: String, sourceType: String, params: Map[String, String])
 
 case class TargetSettings(hipchat: HipchatSettings = null,
-                          mailServer: MailServerSettings = null)
+                          mailServer: MailServerSettings = null,
+                          slack: SlackSettings = null)
 
 case class HipchatSettings(accessToken: String, baseUrl: String)
+
+case class SlackSettings(accessToken: String)
 
 case class MailServerSettings(host: String,
                               port: String,

@@ -3,7 +3,10 @@ dependencies {
             "org.codehaus.groovy:groovy-all:2.4.12",
             "io.evanwong.oss:hipchat-java:0.4.3",
             "org.codehaus.groovy:groovy-all:2.4.12",
-            "com.sun.mail:javax.mail:1.5.6")
+            "com.sun.mail:javax.mail:1.5.6",
+            "org.telegram:telegrambots:3.2",
+            "com.squareup.okhttp3:okhttp:3.8.1")
+
 
     testCompile("org.jvnet.mock-javamail:mock-javamail:1.9")
 }
