@@ -32,11 +32,12 @@ class CountMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
     }
 
     val startTime = new Date().getTime - timeFrame.toMillis
-    val query = Map("query" ->
-      (filter.toSet ++
-        Map("range" -> Map(getTimestampField(params) -> Map("gt" -> startTime))).toSet
-        ).toMap
-    )
+    val query = Map("query" -> Map("bool" -> Map("must" ->
+      Seq(
+        Map("range" -> Map(getTimestampField(params) -> Map("gt" -> startTime))),
+        filter
+      )
+    )))
 
     logger.debug(s"CountMatcher: $query")
 

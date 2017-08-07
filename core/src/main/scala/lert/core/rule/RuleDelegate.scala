@@ -37,13 +37,13 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
 
   def error(message: Any): Unit = logger.error(message.toString)
 
-  def hipchat(room: String, message: String, color: String, notify: Boolean) =
+  def hipchat(room: String, message: String, color: String, notify: Boolean): Unit =
     hipChatTarget.send(room, message, color, notify)
 
-  def email(recipient: String, subject: String, body: String) =
+  def email(recipient: String, subject: String, body: String): Unit =
     emailTarget.send(recipient, subject, body)
 
-  def slack(room: String, message: String) = slackTarget.send(room, message)
+  def slack(channel: String, message: String): Unit = slackTarget.send(channel, message)
 
   def reaction(cl: Closure[Unit]): Unit = {
     reactionWasCalled = true

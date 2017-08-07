@@ -1,3 +1,6 @@
+# Count Rule
+
+```groovy
 rule {
     ruleName = "countRule"
     params = [
@@ -7,9 +10,12 @@ rule {
             filter: [match: [message: "test"]]
     ]
 
-    reaction { messages ->
+    reaction { messages -> // here will be only one message
         messages.each {
-            log(it.data.toString())
+            if (it.data.count > 10) {
+                log("your message")
+            }
         }
     }
 }
+```

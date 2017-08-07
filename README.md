@@ -4,20 +4,28 @@
 
 # L3rt
 
-Simple alerting application. It was inspired by elastalert and the main idea is to provide users with more sophisticated rule system.
+Simple alerting application. It was inspired by elastalert and Jenkins pipelines. The goal is to provide users with more sophisticated rule system.
 
-Currently l3rt support the following sources as an input:
+Currently, l3rt supports the following sources as an input:
 
 * ElasticSearch
 
-Supported output:
+Supported outputs:
 
-* Email
-* Hipchat
+* [Email](docs/mailTarget.md)
+* [Hipchat](docs/hipchatTarget.md)
+* [Slack](docs/slackTarget.md)
+* Missing yours? Add a [feature request](https://github.com/l3rt/l3rt/issues) or submit a pull request 
+
+Supported rules:
+
+* ElasticSearch: [query rule](docs/elasticsearchQueryRule.md) - free-form rule that is fully managed by ElasticSearch's `search` query
+* ElasticSearch: [count rule](docs/elasticsearchCountRule.md) - returns number of events occurred for the given period of time
+* Missing yours? Add a [feature request](https://github.com/l3rt/l3rt/issues) or submit a pull request 
 
 ## How to use
 
-Create a config file:
+Create a config file where you need to specify common configuration for all your rules:
 
 ```json
 {
@@ -33,42 +41,23 @@ Create a config file:
     }
   ],
   "rules": [
-         "/opt/l3rt/rules/exampleRule.groovy"
+         "/opt/l3rt/rules/"
   ],
   "targetSettings": {
-    ... see target settings
+    "mailServer": {
+      "host": "smtp.gmail.com",
+      "port": "465",
+      "auth":  true,
+      "username": "myemail@test.com",
+      "password": "password"
+    }
   }
 }
 ```
 
-Specify the target settings:
+Create your rule. All rules are groovy based DSLs, so you can use all power of groovy in your rules.
 
-### Mail
-
-```json
-        "mailServer": {
-          "host": "...",
-          "port": "...",
-          "auth": "...",
-          "username": "...",
-          "password": "..."
-        }
-```
-
-### Hipchat
-
-```json
-        "hipchat": {
-           "accessToken": "...",
-           "baseUrl": "https://api.hipchat.com/v2/"
-        }
-```
-
-## Rules
-
-All rules are groovy based DSLs, so you can use all power of groovy in your rules.
-
-`exampleRule.groovy`
+`/opt/l3rt/rules/exampleRule.groovy`
 
 ```groovy
 rule {
@@ -77,10 +66,12 @@ rule {
             "index": "logstash-*",
             "query": """{
                         "query": {
-                             "range" : {
-                                    "@timestamp" : {
-                                        "gte": {lastProcessedTimestamp}
-                                    }
+                            "bool": {
+                                "must": [
+                                        {"range": {"@timestamp": {"gt": {lastProcessedTimestamp}}}},
+                                        {"match": { "message": "error" }}
+                                    ]
+                                }
                              }
                         }
                      }
@@ -89,8 +80,12 @@ rule {
 
     reaction { messages ->
         messages.each {
-            email("test@mycompany.com", "Error", it.data.toString())
-            hipchat("Room with logs", it.data.toString(), "RED", true)
+            if (it.data.message.contains("Critical")) {
+                email("manager@mycompany.com", "Error", it.data.message.toString())
+                hipchat("Room with logs", it.data.message.toString(), "RED", true)
+            } else {
+                hipchat("Room with logs", it.data.message.toString(), "YELLOW", true)
+            }
         }
     }
 }
@@ -98,24 +93,28 @@ rule {
 
 ## Build & Launch 
 
+1. Build
 `./gradlew application:jar `
 
+2. Run
 `CONFIG=~/conf.json java -jar ./l3rt-0.1.0.jar`
+
+NOTE: l3rt requires >= Java 8
 
 ### or Docker
 
 `docker run -it -v ~/conf.json:/l3rt/config/config.json -v ~/rules:/l3rt/rules dimafeng/l3rt:0.1.0`
 
-Put your rules inside `~/rules` and use them in the `config.json` as follows:
+Put your rules inside `~/rules` on your local machine and use them in the `config.json` as follows:
 
 ```json
 {
-...
   "rules": [
-         "/l3rt/rules/exampleRule.groovy"
+         "/l3rt/rules/"
   ]
-...
 }
 ```
 
-NOTE: l3rt requires >= Java 8
+## Contributions
+
+This project is in heavy development stage so all contributions are appreciated. 
