@@ -4,6 +4,7 @@ rule {
             index: "logstash-*",
             matcher: "count",
             timeframe: "30s",
+            numberOfTimeframes: 5,
             filter: [match: [message: "test"]]
     ]
 
