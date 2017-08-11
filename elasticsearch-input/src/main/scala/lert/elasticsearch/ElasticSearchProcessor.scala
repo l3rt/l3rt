@@ -38,8 +38,14 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
       case Some((latestId, latestTimestamp)) =>
         val messages = matcher.query(restClient(source), params, statusProvider.getRuleStatus(ruleName))
 
-        // TODO try to find latestId in messages if exists
-        statusProvider.logRule(Status(ruleName, latestTimestamp, latestId))
+        val processedIds = messages.map(_.data.get("id").orNull).filterNot(_ == null).map(_.asInstanceOf[String]).toSet
+        statusProvider.logRule(Status(
+          ruleName,
+          processedIds,
+          latestTimestamp,
+          latestId,
+          new Date()
+        ))
 
         messages
       case _ => Seq()

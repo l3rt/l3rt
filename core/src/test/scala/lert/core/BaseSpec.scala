@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class BaseSpec extends FlatSpec {
-  val objectMapper = new ObjectMapper() {
+  lazy val objectMapper = new ObjectMapper() {
     registerModule(DefaultScalaModule)
   }
 }
