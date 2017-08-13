@@ -6,6 +6,8 @@
 
 Simple alerting application. It was inspired by elastalert and Jenkins pipelines. The goal is to provide users with more sophisticated rule system.
 
+[![Feature Requests](http://feathub.com/l3rt/l3rt?format=svg)](http://feathub.com/l3rt/l3rt)
+
 Currently, l3rt supports the following sources as an input:
 
 * ElasticSearch
