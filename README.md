@@ -17,13 +17,13 @@ Supported outputs:
 * [Email](docs/mailTarget.md)
 * [Hipchat](docs/hipchatTarget.md)
 * [Slack](docs/slackTarget.md)
-* Missing yours? Add a [feature request](https://github.com/l3rt/l3rt/issues) or submit a pull request 
+* Missing yours? Add a [feature request](http://feathub.com/l3rt/l3rt) or submit a pull request 
 
 Supported rules:
 
 * ElasticSearch: [query rule](docs/elasticsearchQueryRule.md) - free-form rule that is fully managed by ElasticSearch's `search` query
 * ElasticSearch: [count rule](docs/elasticsearchCountRule.md) - returns number of events occurred for the given period of time
-* Missing yours? Add a [feature request](https://github.com/l3rt/l3rt/issues) or submit a pull request 
+* Missing yours? Add a [feature request](http://feathub.com/l3rt/l3rt) or submit a pull request 
 
 ## How to use
 

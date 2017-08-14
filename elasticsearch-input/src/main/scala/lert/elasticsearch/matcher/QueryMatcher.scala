@@ -17,7 +17,7 @@ class QueryMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
     params.contains("query")
 
   override def query(client: RestClient, params: Map[String, _], status: Option[Status]): Seq[AlertMessage] = {
-    val lastProcessedTimestamp = status.map(_.lastProcessedTimestamp).getOrElse(new Date(0))
+    val lastProcessedTimestamp = status.map(_.lastSeenTimestamp).getOrElse(new Date(0))
     val query = params("query").toString.replace("{lastProcessedTimestamp}", lastProcessedTimestamp.getTime.toString)
     val body = new NStringEntity(query, ContentType.APPLICATION_JSON)
     client
