@@ -1,4 +1,4 @@
-rootProject.name = 'monalert'
+rootProject.name = 'lert'
 include 'core'
 include 'elasticsearch-input'
 include 'application'

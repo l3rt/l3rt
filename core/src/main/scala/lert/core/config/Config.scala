@@ -1,14 +1,13 @@
 package lert.core.config
 
-import javax.annotation.Nullable
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 case class Config(delay: Int = 0,
                   sources: Seq[Source] = null,
                   rules: Seq[String] = null,
-                  targetSettings: TargetSettings = null)
+                  targetSettings: TargetSettings = null,
+                  home: String = null)
 
 case class Source(name: String, sourceType: String, params: Map[String, String])
 

@@ -1,9 +1,10 @@
 package lert.core.config
 
 import java.io.InputStream
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 import javax.inject.{Inject, Named}
 
+import ConfigProvider._
 import com.fasterxml.jackson.databind.ObjectMapper
 
 trait ConfigParser {
@@ -18,6 +19,19 @@ class JsonConfigParser @Inject()(objectMapper: ObjectMapper) extends ConfigParse
 
 trait ConfigProvider {
   def config: Config
+
+  def getLertHome(): Path = {
+    val lertHome = Option(config.home).map(Paths.get(_)).getOrElse(Paths.get(HOME_DIR, LERT_TEMP_DIR))
+    if (!Files.exists(lertHome)) {
+      Files.createDirectories(lertHome)
+    }
+    lertHome
+  }
+}
+
+object ConfigProvider {
+  private val HOME_DIR = System.getProperty("user.home")
+  private val LERT_TEMP_DIR = ".l3rt"
 }
 
 class SimpleConfigProvider(val config: Config) extends ConfigProvider

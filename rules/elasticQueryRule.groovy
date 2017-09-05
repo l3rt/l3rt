@@ -3,16 +3,11 @@ rule {
     ruleName = "myTestRule"
     params = [
             "index": "logstash-*",
-            "query": """{
-                        "query": {
-                             "range" : {
-                                    "@timestamp" : {
-                                        "gt": {lastProcessedTimestamp}
-                                    }
-                             }
-                        }
-                     }
-                    """
+            "query": [
+                    query: [
+                        range: ["@timestamp": [gt: lastSeenTimestamp]]
+                    ]
+            ]
     ]
 
     reaction { messages ->

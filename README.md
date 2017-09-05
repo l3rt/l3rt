@@ -57,6 +57,8 @@ Create a config file where you need to specify common configuration for all your
 }
 ```
 
+You can find more info about config [here](docs/config.md).
+
 Create your rule. All rules are groovy based DSLs, so you can use all power of groovy in your rules.
 
 `/opt/l3rt/rules/exampleRule.groovy`

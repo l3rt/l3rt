@@ -13,7 +13,7 @@ import lert.core.config._
 import lert.core.processor.Processor
 import lert.core.rule.target.TargetHelper
 import lert.core.rule.{GroovyRuleRunner, RuleRunner}
-import lert.core.status.{FileStatusProvider, StatusProvider}
+import lert.core.state.{FileStateProvider, StateProvider}
 import lert.core.{Task, TaskManager}
 import net.codingwell.scalaguice.ScalaModule
 import org.reflections.Reflections
@@ -46,7 +46,7 @@ class ApplicationModule extends ScalaModule with LazyLogging {
     bind[ObjectMapper].toInstance(new ObjectMapper() {
       registerModule(DefaultScalaModule)
     })
-    bind[StatusProvider].to[FileStatusProvider]
+    bind[StateProvider].to[FileStateProvider]
     bind[GlobalCache].to[GuavaCache].in[Singleton]
 
     bind[ConfigParser].to[JsonConfigParser]

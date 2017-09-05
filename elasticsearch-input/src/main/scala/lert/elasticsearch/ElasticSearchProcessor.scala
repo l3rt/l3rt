@@ -2,7 +2,7 @@ package lert.elasticsearch
 
 import java.text.SimpleDateFormat
 import java.util
-import java.util.{Collections, Date, TimeZone}
+import java.util.{Collections, TimeZone}
 import javax.inject.Inject
 
 import scala.collection.JavaConverters._
@@ -12,8 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.LazyLogging
 import lert.core.cache.GlobalCache
 import lert.core.config.Source
-import lert.core.processor.{AlertMessage, Processor}
-import lert.core.status.{Status, StatusProvider}
+import lert.core.processor.{AlertMessage, LastSeenData, Processor}
 import lert.elasticsearch.ElasticSearchProcessor._
 import lert.elasticsearch.ElasticSearchProcessorUtils._
 import lert.elasticsearch.matcher.Matcher
@@ -21,7 +20,6 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 
 class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
-                                       statusProvider: StatusProvider,
                                        cache: GlobalCache,
                                        matchers: util.Set[Matcher]) extends Processor with LazyLogging {
 
@@ -34,37 +32,14 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
     val matcher = matchers.asScala.find(_.supports(params))
       .getOrElse(throw new IllegalArgumentException(s"Couldn't find a matcher for $params"))
 
-    getLastRecordIdAndDate(getIndexName(params), source, params) match {
-      case Some((latestId, latestTimestamp)) =>
-        val messages = matcher.query(restClient(source), params, statusProvider.getRuleStatus(ruleName))
-
-        val processedIds = messages.map(_.data.get("id").map(_.toString).orNull).filterNot(_ == null).toSet
-        statusProvider.logRule(Status(
-          ruleName,
-          processedIds,
-          latestTimestamp,
-          latestId,
-          new Date()
-        ))
-
-        messages
-      case _ => Seq()
-    }
+    matcher.query(restClient(source), params)
   }
 
-  protected def restClient(source: Source): RestClient = {
-    cache.get(
-      "elasticRestClient",
-      source,
-      RestClient.builder(new HttpHost(source.params(PARAM_HOST), source.params(PARAM_PORT).toInt, source.params(PARAM_SCHEMA))).build()
-    )
-  }
-
-  protected def getLastRecordIdAndDate(index: String, source: Source, params: Map[String, _]): Option[(String, Date)] = {
+  override def lastSeenData(ruleName: String, source: Source, params: Map[String, Any]): Option[LastSeenData] = {
     val record = restClient(source)
       .performRequest(
         "GET",
-        s"/$index/_search",
+        s"/${getIndexName(params)}/_search",
         Collections.emptyMap[String, String](),
         httpEntity(Map(
           "query" -> Map("match_all" -> Map()),
@@ -76,8 +51,16 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
     record.map { v =>
       val timestamp = v._source(getTimestampField(params)).toString
 
-      (v._id, DATE_FORMAT.parse(timestamp))
+      LastSeenData(DATE_FORMAT.parse(timestamp), v._id)
     }
+  }
+
+  protected def restClient(source: Source): RestClient = {
+    cache.get(
+      "elasticRestClient",
+      source,
+      RestClient.builder(new HttpHost(source.params(PARAM_HOST), source.params(PARAM_PORT).toInt, source.params(PARAM_SCHEMA))).build()
+    )
   }
 }
 

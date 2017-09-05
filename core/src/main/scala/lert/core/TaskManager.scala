@@ -2,6 +2,8 @@ package lert.core
 
 import java.util.concurrent.{Executors, TimeUnit}
 
+import scala.util.{Failure, Try}
+
 import lert.core.config.ConfigProvider
 import lert.core.rule.RuleLoader
 import com.google.inject.Inject

@@ -76,8 +76,7 @@ class CountMatcherSpec extends BaseSpec {
 
     val query = matcher.query(
       restClient,
-      Map("timeframe" -> "3 min", "filter" -> Collections.emptyMap(), "index" -> "i"),
-      None
+      Map("timeframe" -> "3 min", "filter" -> Collections.emptyMap(), "index" -> "i")
     )
     assert(query == Seq(
       AlertMessage(

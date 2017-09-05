@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.LazyLogging
 import lert.core.processor.AlertMessage
-import lert.core.status.Status
+import lert.core.state.State
 import lert.elasticsearch.ElasticSearchProcessor
 import lert.elasticsearch.ElasticSearchProcessorUtils._
 import lert.elasticsearch.matcher.CountMatcher._
@@ -22,7 +22,7 @@ class CountMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
     params.contains(MATCHER_PARAMETER) && params(MATCHER_PARAMETER).toString.toLowerCase == "count"
   }
 
-  override def query(client: RestClient, params: Map[String, _], status: Option[Status]): Seq[AlertMessage] = {
+  override def query(client: RestClient, params: Map[String, _]): Seq[AlertMessage] = {
     require(params.contains(TIMEFRAME_PARAMETER), s"$TIMEFRAME_PARAMETER is not defined in $params")
     require(params.contains(FILTER_PARAMETER), s"$FILTER_PARAMETER is not defined in $params")
 
@@ -37,23 +37,29 @@ class CountMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
     val query = createQuery(timeFrame, numberOfTimeFrames, filter, params)
     logger.debug(s"CountMatcher: $query")
 
-    val buckets = client.performRequest(
+    val response = client.performRequest(
       "GET",
       s"/${getIndexName(params)}/_search",
       Collections.emptyMap[String, String](),
       httpEntity(query)
-    ).getEntity.to[Response].aggregations.range.buckets
+    ).getEntity.to[Response]
 
-    buckets.map {
-      case Bucket(from, to, count) =>
-        val dateFrom = ElasticSearchProcessor.DATE_FORMAT.parse(from)
-        val dateTo = ElasticSearchProcessor.DATE_FORMAT.parse(to)
-        AlertMessage(Map(
-          "count" -> count,
-          "from" -> dateFrom,
-          "to" -> dateTo
-        ))
-    }.sortBy(_.data("from").asInstanceOf[Date])
+    Option(response.aggregations).map(_.range.buckets) match {
+
+      case Some(buckets) =>
+        buckets.map {
+          case Bucket(from, to, count) =>
+            val dateFrom = ElasticSearchProcessor.DATE_FORMAT.parse(from)
+            val dateTo = ElasticSearchProcessor.DATE_FORMAT.parse(to)
+            AlertMessage(Map(
+              "count" -> count,
+              "from" -> dateFrom,
+              "to" -> dateTo
+            ))
+        }.sortBy(_.data("from").asInstanceOf[Date])
+
+      case _ => Seq()
+    }
   }
 
   protected[matcher] def createQuery(timeFrame: Duration, numberOfTimeFrames: Int, filter: Map[String, _], params: Map[String, _], currentTime: Long = new Date().getTime): Map[String, _] = {
