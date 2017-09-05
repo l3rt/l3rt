@@ -14,23 +14,17 @@ trait RuleRunner {
 
 class GroovyRuleRunner extends RuleRunner with LazyLogging {
   override def process(script: InputStream): Unit = {
-    try {
-      val bindings = new Binding() {
-        //setVariable("message", JavaUtils.toJava(mes.data))
-      }
-      val importCustomizer = new ImportCustomizer()
-      importCustomizer.addStaticStars(classOf[TargetHelper].getName)
-
-      val config = new CompilerConfiguration() {
-        addCompilationCustomizers(importCustomizer)
-      }
-
-      val shell = new GroovyShell(this.getClass.getClassLoader, bindings, config)
-      shell.evaluate(new BufferedReader(new InputStreamReader(script)))
-    } catch {
-      case ex: Exception =>
-        logger.error(ex.getLocalizedMessage)
-        logger.debug(ex.getLocalizedMessage, ex)
+    val bindings = new Binding() {
+      //setVariable("message", JavaUtils.toJava(mes.data))
     }
+    val importCustomizer = new ImportCustomizer()
+    importCustomizer.addStaticStars(classOf[TargetHelper].getName)
+
+    val config = new CompilerConfiguration() {
+      addCompilationCustomizers(importCustomizer)
+    }
+
+    val shell = new GroovyShell(this.getClass.getClassLoader, bindings, config)
+    shell.evaluate(new BufferedReader(new InputStreamReader(script)))
   }
 }
