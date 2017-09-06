@@ -6,4 +6,4 @@ dependencies {
     )
 }
 
-test.onlyIf {project.hasProperty('integration') || gradle.taskGraph.getAllTasks().find{it.getName().endsWith("jar")} != null}
+test.onlyIf {project.hasProperty('integration') || gradle.taskGraph.getAllTasks().find{it.getName().endsWith("buildDocker")} != null}
