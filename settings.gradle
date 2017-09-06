@@ -2,4 +2,5 @@ rootProject.name = 'lert'
 include 'core'
 include 'elasticsearch-input'
 include 'application'
+include 'integration-tests'
 

@@ -1,5 +1,6 @@
 package lert.core.rule
 
+import java.nio.file.{Files, Paths, StandardOpenOption}
 import java.util
 import java.util.{Collections, Date}
 import javax.inject.Inject
@@ -60,6 +61,9 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
       .map(JavaUtils.toJava)
       .map(_.asInstanceOf[util.Map[Any, Any]])
       .getOrElse(Collections.emptyMap[Any, Any]())
+
+  def file(file: String, data: String) =
+    Files.write(Paths.get(file), (data + "\n").getBytes, StandardOpenOption.APPEND, StandardOpenOption.CREATE)
 
   def log(message: Any): Unit = logger.info(message.toString)
 

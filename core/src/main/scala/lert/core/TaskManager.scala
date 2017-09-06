@@ -17,7 +17,10 @@ class TaskManager(period: Long, task: Task) extends LazyLogging {
     logger.info("Task manager has been started")
   }
 
-  def stop(): Unit = scheduler.shutdownNow()
+  def stop(): Unit = {
+    scheduler.shutdownNow()
+    logger.info("Task manager has been stopped")
+  }
 }
 
 class Task @Inject()(configProvider: ConfigProvider,

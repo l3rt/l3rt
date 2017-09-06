@@ -1,0 +1,9 @@
+dependencies {
+    compile project(":application")
+    testCompile project(":core").sourceSets.test.output
+    testCompile(
+            'com.dimafeng:testcontainers-scala_2.12:0.7.0'
+    )
+}
+
+test.onlyIf {project.hasProperty('integration') || gradle.taskGraph.getAllTasks().find{it.getName().endsWith("jar")} != null}
