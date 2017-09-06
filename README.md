@@ -68,18 +68,15 @@ rule {
     ruleName = "myTestRule"
     params = [
             "index": "logstash-*",
-            "query": """{
-                        "query": {
-                            "bool": {
-                                "must": [
-                                        {"range": {"@timestamp": {"gt": {lastProcessedTimestamp}}}},
-                                        {"match": { "message": "error" }}
+            "query": [query: [
+                            bool: [
+                                must: [
+                                        ["range": ["@timestamp": ["gt": [lastSeenTimestamp]]]],
+                                        ["match": [ "message": "error" ]]
                                     ]
-                                }
-                             }
-                        }
-                     }
-                    """
+                                ]
+                             ]
+                        ]
     ]
 
     reaction { messages ->
