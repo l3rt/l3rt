@@ -1,3 +1,7 @@
+plugins {
+    id 'net.researchgate.release' version '2.4.0'
+}
+
 group 'lert'
 
 subprojects {
@@ -11,14 +15,16 @@ subprojects {
     sourceSets.main.java.srcDirs = []
 
     dependencies {
-        compile("org.scala-lang:scala-library:2.12.1",
-                "ch.qos.logback:logback-classic:1.2.3",
-                "com.typesafe.scala-logging:scala-logging_2.12:3.7.1",
-                "net.codingwell:scala-guice_2.12:4.1.0",
-                "org.reflections:reflections:0.9.11"
+        compile("org.scala-lang:scala-library:$scalaVersion",
+                "ch.qos.logback:logback-classic:$logbackVersion",
+                "com.typesafe.scala-logging:scala-logging_2.12:$scalaLoggingVersion",
+                "net.codingwell:scala-guice_2.12:$scalaGuiceVersion",
+                "org.reflections:reflections:$reflectionsVersion"
         )
-        testCompile("org.scalatest:scalatest_2.12:3.0.3",
-                "org.mockito:mockito-all:1.10.19",
-                "junit:junit:4.12")
+        testCompile("org.scalatest:scalatest_2.12:$scalatestVersion",
+                "org.mockito:mockito-all:$mockitoVersion",
+                "junit:junit:$junitVersion")
     }
 }
+
+task build(dependsOn: ":application:buildDocker") {}
