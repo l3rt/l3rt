@@ -98,13 +98,13 @@ rule {
 `./gradlew application:jar `
 
 2. Run
-`CONFIG=~/conf.json java -jar ./l3rt-0.1.0.jar`
+`CONFIG=~/conf.json java -jar ./l3rt-0.1.1.jar`
 
 NOTE: l3rt requires >= Java 8
 
 ### or Docker
 
-`docker run -it -v ~/conf.json:/l3rt/config/config.json -v ~/rules:/l3rt/rules dimafeng/l3rt:0.1.0`
+`docker run -it -v ~/conf.json:/l3rt/config/config.json -v ~/rules:/l3rt/rules dimafeng/l3rt:0.1.1`
 
 Put your rules inside `~/rules` on your local machine and use them in the `config.json` as follows:
 
