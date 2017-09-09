@@ -2,6 +2,7 @@ package lert.test.integration
 
 import java.lang.Thread._
 import java.nio.file.Files
+import java.util.Date
 
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -12,6 +13,8 @@ class QueryMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
 
     val tempFile = Files.createTempFile("rule", ".out")
 
+    val now = new Date().getTime
+
     prepareApplication(createTempRule(
       s"""
          |rule {
@@ -20,7 +23,7 @@ class QueryMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
          |            "index": "logstash-*",
          |            "query": [
          |                    query: [
-         |                        range: ["@timestamp": [gt: lastSeenTimestamp]]
+         |                        range: ["@timestamp": [gt: lastSeenTimestamp?: new Date($now)]]
          |                    ]
          |            ]
          |    ]

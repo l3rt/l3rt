@@ -5,7 +5,7 @@ rule {
             "index": "logstash-*",
             "query": [
                     query: [
-                        range: ["@timestamp": [gt: lastSeenTimestamp]]
+                        range: ["@timestamp": [gt: lastSeenTimestamp ?: new Date()]]
                     ]
             ]
     ]
