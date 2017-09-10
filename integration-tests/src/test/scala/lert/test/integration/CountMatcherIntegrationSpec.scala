@@ -24,7 +24,7 @@ class CountMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
          |            filter: [:]
          |    ]
          |
-         |    skip = (new Date().getTime() - lastExecutionTime.getTime() < 10000)
+         |    skip = (new Date().getTime() - (lastExecutionTime?:new Date(0)).getTime() < 10000)
          |
          |    reaction { messages ->
          |        messages.each {

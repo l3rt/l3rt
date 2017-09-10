@@ -16,10 +16,7 @@ import lert.core.state.{FileStateProvider, StateProvider}
 import net.codingwell.scalaguice.ScalaModule
 import org.reflections.Reflections
 
-class ApplicationModule extends ScalaModule with LazyLogging {
-  private val CONFIG_ENV = "CONFIG"
-  private val CONFIG_PROPERTY = "config"
-
+class ApplicationModule(args: Array[String]) extends ScalaModule with LazyLogging {
   override def configure(): Unit = {
     bind[RuleRunner].to[GroovyRuleRunner]
     val objectMapper = new ObjectMapper() {
@@ -29,19 +26,10 @@ class ApplicationModule extends ScalaModule with LazyLogging {
     bind[StateProvider].to[FileStateProvider]
     bind[GlobalCache].to[GuavaCache].in[Singleton]
 
+    bind[Array[String]].annotatedWithName("args").toInstance(args)
     bind[ConfigParser].to[JsonConfigParser]
-    val configFile = Option(System.getenv(CONFIG_ENV))
-      .orElse(Option(System.getProperty(CONFIG_PROPERTY)))
-      .orNull
 
-    if (configFile != null) {
-      bind[ConfigProvider].to[FileConfigProvider]
-      bind[String].annotatedWithName("configFile").toInstance(configFile)
-    } else if (System.getProperty("config.body") != null) {
-      bind[ConfigProvider].toInstance(SimpleConfigProvider(objectMapper.readValue(System.getProperty("config.body"), classOf[Config])))
-    } else {
-      throw new IllegalStateException("Config is not defined")
-    }
+    bind[ConfigProvider].to[FileConfigProvider]
 
     logger.info("Dynamically loaded processors:")
 

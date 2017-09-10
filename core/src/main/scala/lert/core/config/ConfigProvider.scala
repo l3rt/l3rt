@@ -4,8 +4,8 @@ import java.io.InputStream
 import java.nio.file.{Files, Path, Paths}
 import javax.inject.{Inject, Named}
 
-import ConfigProvider._
 import com.fasterxml.jackson.databind.ObjectMapper
+import lert.core.config.ConfigProvider._
 
 trait ConfigParser {
   def read(is: InputStream): Config
@@ -41,9 +41,9 @@ object SimpleConfigProvider {
 }
 
 class FileConfigProvider @Inject()(configReader: ConfigParser,
-                                   @Named("configFile") val configFile: String) extends ConfigProvider {
+                                   argumentProvider: ArgumentProvider) extends ConfigProvider {
   override def config: Config = {
-    val inputStream = Files.newInputStream(Paths.get(configFile))
+    val inputStream = Files.newInputStream(Paths.get(argumentProvider.arguments.config))
     try {
       configReader.read(inputStream)
     } finally {

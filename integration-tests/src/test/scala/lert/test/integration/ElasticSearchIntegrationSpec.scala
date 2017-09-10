@@ -12,7 +12,6 @@ import lert.core.BaseSpec
 import lert.core.config.{Config, Source}
 import lert.elasticsearch.ElasticSearchProcessor
 import org.apache.commons.io.FileUtils
-import org.apache.http.HttpHost
 import org.apache.http.entity.ContentType
 import org.apache.http.nio.entity.NStringEntity
 import org.elasticsearch.client.RestClient
@@ -52,13 +51,14 @@ class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer wi
     val home = Files.createTempDirectory(s"${this.getClass.getSimpleName}_home")
     logger.info(s"Test's home: $home")
     files += home
-    System.setProperty("config.body", objectMapper.writeValueAsString(Config(
+    val config = Files.createTempFile("config", this.getClass.getSimpleName)
+    files += config
+    Files.write(config, objectMapper.writeValueAsBytes(Config(
       1000,
       sources = Seq(Source("test", "lert.elasticsearch.ElasticSearchProcessor", Map("host" -> "localhost", "port" -> container.mappedPort(9200).toString, "schema" -> "http"))),
-      rules = Seq(rule.toString),
       home = home.toString
     )))
-    Application.main(Array())
+    Application.main(Array("--config", config.toString, "--rules", rule.toString))
   }
 
   protected def stopApplication() = {

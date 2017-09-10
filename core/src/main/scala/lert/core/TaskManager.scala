@@ -2,12 +2,10 @@ package lert.core
 
 import java.util.concurrent.{Executors, TimeUnit}
 
-import scala.util.{Failure, Try}
-
-import lert.core.config.ConfigProvider
-import lert.core.rule.RuleLoader
 import com.google.inject.Inject
 import com.typesafe.scalalogging.LazyLogging
+import lert.core.config.{ArgumentProvider, ConfigProvider}
+import lert.core.rule.RuleLoader
 
 class TaskManager(period: Long, task: Task) extends LazyLogging {
   private val scheduler = Executors.newSingleThreadScheduledExecutor()
@@ -23,16 +21,17 @@ class TaskManager(period: Long, task: Task) extends LazyLogging {
   }
 }
 
-class Task @Inject()(configProvider: ConfigProvider,
+class Task @Inject()(argumentProvider: ArgumentProvider,
                      ruleLoader: RuleLoader) extends Runnable with LazyLogging {
   override def run(): Unit = {
     try {
-      val config = configProvider.config
-      require(config != null, "Config is not specified")
+      val args = argumentProvider.arguments
+      require(args.rules != null, "Rule location not specified")
 
       logger.debug("Task is being run")
-      config
+      args
         .rules
+        .split(";")
         .foreach(ruleLoader.process)
     } catch {
       case ex: Any =>

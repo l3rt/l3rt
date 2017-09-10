@@ -17,7 +17,12 @@ object Application extends App with LazyLogging {
       .filter(_.getPackage.getName.startsWith(BASE_PACKAGE))
       .map { c =>
         logger.info(s"Loading module: $c")
-        c.newInstance()
+        try {
+          c.getConstructor(classOf[Array[String]]).newInstance(args)
+        } catch {
+          case _: NoSuchMethodException =>
+            c.newInstance()
+        }
       }.asJava
   )
   TargetHelper.setInjector(injector)

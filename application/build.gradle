@@ -31,8 +31,7 @@ jar {
 task buildDocker(type: Docker) {
     println(jar.archivePath)
     baseImage = 'java:8u111-jre'
-    setEnvironment('CONFIG', '/l3rt/config/config.json')
-    entryPoint(['java','-server','-jar','/opt/l3rt.jar'])
+    entryPoint(['java','-server','-jar','/opt/l3rt.jar','--config','/l3rt/config/config.json','rules','/l3rt/rules/'])
     push = false
     applicationName = 'lert'
     addFile jar.archivePath, '/opt/l3rt.jar'

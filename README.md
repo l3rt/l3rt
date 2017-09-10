@@ -42,9 +42,6 @@ Create a config file where you need to specify common configuration for all your
       }
     }
   ],
-  "rules": [
-         "/opt/l3rt/rules/"
-  ],
   "targetSettings": {
     "mailServer": {
       "host": "smtp.gmail.com",
@@ -98,23 +95,15 @@ rule {
 `./gradlew application:jar `
 
 2. Run
-`CONFIG=~/conf.json java -jar ./l3rt-0.1.1.jar`
+`java -jar ./l3rt-0.1.1.jar --config ~/conf.json --rules /opt/l3rt/rules/`
 
 NOTE: l3rt requires >= Java 8
 
 ### or Docker
 
+Create your config `~/conf.json` and put all your rules inside `~/rules` on your local machine. Then start it as follows:
+
 `docker run -it -v ~/conf.json:/l3rt/config/config.json -v ~/rules:/l3rt/rules dimafeng/l3rt:0.1.1`
-
-Put your rules inside `~/rules` on your local machine and use them in the `config.json` as follows:
-
-```json
-{
-  "rules": [
-         "/l3rt/rules/"
-  ]
-}
-```
 
 ## Contributions
 
