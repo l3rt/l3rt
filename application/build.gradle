@@ -13,6 +13,7 @@ apply plugin: 'docker'
 dependencies {
     compile project(":core")
     compile project(":elasticsearch-input")
+    compile project(":rest")
 }
 
 ext.mainClassName = "lert.Application"

@@ -7,11 +7,12 @@ import com.typesafe.scalalogging.LazyLogging
 import lert.core.config.{ArgumentProvider, ConfigProvider}
 import lert.core.rule.RuleLoader
 
-class TaskManager(period: Long, task: Task) extends LazyLogging {
+class TaskManager @Inject()(configProvider: ConfigProvider, task: Task) extends LazyLogging {
   private val scheduler = Executors.newSingleThreadScheduledExecutor()
 
   def start(): Unit = {
-    scheduler.scheduleWithFixedDelay(task, 0, period, TimeUnit.MILLISECONDS)
+    val delay = configProvider.config.delay
+    scheduler.scheduleWithFixedDelay(task, 0, if (delay < 1000) 5000 else delay, TimeUnit.MILLISECONDS)
     logger.info("Task manager has been started")
   }
 

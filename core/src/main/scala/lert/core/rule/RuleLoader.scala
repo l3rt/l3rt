@@ -1,51 +1,31 @@
 package lert.core.rule
 
-import java.io.ByteArrayInputStream
 import java.nio.file.{Files, Paths}
+
+import scala.collection.JavaConverters._
 
 import com.google.inject.Inject
 
-class RuleLoader @Inject()(ruleProcessor: RuleRunner) {
+class RuleLoader @Inject()(ruleRunner: RuleRunner, ruleSource: RuleSource) {
   def process(rule: String): Unit = {
-    if (rule.startsWith("classpath:")) {
-      new ClasspathRule(rule).processMessages(ruleProcessor)
-
-    } else if (rule.startsWith("/")) {
-      val path = Paths.get(rule)
-      if (Files.isDirectory(path)) {
-        new FolderRule(rule).processMessages(ruleProcessor)
-      } else {
-        new FileRule(rule).processMessages(ruleProcessor)
-      }
-
-    } else {
-      throw new IllegalArgumentException(s"A rule loader for $rule is not found")
-    }
+    ruleSource.load(rule).foreach { case Rule(_, script) => ruleRunner.process(script) }
   }
 }
 
-trait Rule {
-  def processMessages(ruleProcessor: RuleRunner)
+case class Rule(id: String, script: String)
+
+trait RuleSource {
+  def load(location: String): Seq[Rule]
 }
 
-class ClasspathRule(filePath: String) extends Rule {
-  override def processMessages(ruleProcessor: RuleRunner): Unit = {
-    ruleProcessor.process(this.getClass.getClassLoader.getResourceAsStream(filePath))
-  }
-}
-
-class FileRule(filePath: String) extends Rule {
-  override def processMessages(ruleProcessor: RuleRunner): Unit = {
-    val bytes = Files.readAllBytes(Paths.get(filePath))
-    ruleProcessor.process(new ByteArrayInputStream(bytes))
-  }
-}
-
-class FolderRule(folderPath: String) extends Rule {
-  override def processMessages(ruleProcessor: RuleRunner): Unit = {
-    Files.newDirectoryStream(Paths.get(folderPath)).forEach { p =>
-      val bytes = Files.readAllBytes(p)
-      ruleProcessor.process(new ByteArrayInputStream(bytes))
-    }
+class FolderRuleSource extends RuleSource {
+  override def load(location: String): Seq[Rule] = {
+    val path = Paths.get(location)
+    Files
+      .newDirectoryStream(path)
+      .asScala
+      .map { p =>
+        Rule(path.relativize(p).toString, new String(Files.readAllBytes(p)))
+      }.toSeq
   }
 }

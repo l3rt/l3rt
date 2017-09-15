@@ -1,0 +1,15 @@
+.sidebar, body > .navbar-collapse {
+  width: 80px;
+}
+
+.sidebar .sidebar-wrapper, body > .navbar-collapse .sidebar-wrapper {
+  width: 80px;
+}
+
+.main-panel {
+  width: calc(100% - 80px);
+}
+
+.content-container {
+  padding-left: 20px;
+}

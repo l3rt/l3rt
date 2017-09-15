@@ -1,0 +1,4 @@
+dependencies {
+    compile("io.undertow:undertow-core:$undertowVersion")
+    compile project(":core")
+}

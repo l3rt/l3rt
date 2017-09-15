@@ -1,19 +1,17 @@
 package lert.core.rule
 
-import java.io.{BufferedReader, InputStream, InputStreamReader}
-
 import com.typesafe.scalalogging.LazyLogging
-import lert.core.rule.target.TargetHelper
 import groovy.lang.{Binding, GroovyShell}
+import lert.core.rule.target.TargetHelper
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 
 trait RuleRunner {
-  def process(script: InputStream)
+  def process(script: String)
 }
 
 class GroovyRuleRunner extends RuleRunner with LazyLogging {
-  override def process(script: InputStream): Unit = {
+  override def process(script: String): Unit = {
     val bindings = new Binding() {
       //setVariable("message", JavaUtils.toJava(mes.data))
     }
@@ -25,6 +23,6 @@ class GroovyRuleRunner extends RuleRunner with LazyLogging {
     }
 
     val shell = new GroovyShell(this.getClass.getClassLoader, bindings, config)
-    shell.evaluate(new BufferedReader(new InputStreamReader(script)))
+    shell.evaluate(script)
   }
 }
