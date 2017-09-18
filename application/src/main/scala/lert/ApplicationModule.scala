@@ -1,7 +1,6 @@
 package lert
 
 import scala.collection.JavaConverters._
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.google.inject.{Inject, Injector, Provides, Singleton}
@@ -50,9 +49,5 @@ class ApplicationModule(args: Array[String]) extends ScalaModule with LazyLoggin
 
   @Inject def initTaskManager(instance: TaskManager): Unit = {
     instance.start()
-  }
-
-  @Inject def targetHelper(injector: Injector): Unit = {
-    TargetHelper.setInjector(injector)
   }
 }

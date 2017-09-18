@@ -1,14 +1,14 @@
 import {Observable} from 'rx';
-import {Rule} from './model';
+import {ExecutionResult, RunRequest} from './model';
 import {Rest} from '../app/Rest';
 import {Config} from '../app/Config';
 
 export class ScriptService {
-  getRules(): Observable<Rule[]> {
-    return Rest.doGet<Rule[]>(`${Config.BASE_URL}/rules`);
-  }
+    getRules(): Observable<RunRequest[]> {
+        return Rest.doGet<RunRequest[]>(`${Config.BASE_URL}/rules`);
+    }
 
-  runScript(script: string): Observable<any> {
-    return Rest.doPost<any, any>(`${Config.BASE_URL}/runScript`, {script});
-  }
+    runScript(script: string, mockTargets: boolean): Observable<ExecutionResult> {
+        return Rest.doPost<any, ExecutionResult>(`${Config.BASE_URL}/runScript`, {script, mockTargets});
+    }
 }

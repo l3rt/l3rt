@@ -5,23 +5,22 @@ import java.util
 import java.util.{Collections, Date}
 import javax.inject.Inject
 
-import scala.beans.BeanProperty
-import scala.collection.JavaConverters._
-
+import com.typesafe.scalalogging.LazyLogging
+import groovy.lang.Closure
 import lert.core.ProcessorLoader
 import lert.core.config.{Config, ConfigProvider}
 import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget}
+import lert.core.state.{RuleState, State, StateProvider}
 import lert.core.utils.JavaUtils
-import com.typesafe.scalalogging.LazyLogging
-import groovy.lang.Closure
-import lert.core.state.{State, StateProvider}
+
+import scala.beans.BeanProperty
+import scala.collection.JavaConverters._
 
 class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
                              emailTarget: EmailTarget,
                              slackTarget: SlackTarget,
                              configProvider: ConfigProvider,
-                             processorLoader: ProcessorLoader,
-                             stateProvider: StateProvider) extends LazyLogging {
+                             processorLoader: ProcessorLoader) extends LazyLogging {
   @BeanProperty
   var sourceName: String = _
 
@@ -33,6 +32,8 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
 
   @BeanProperty
   val config: Config = configProvider.config
+
+  var stateProvider: StateProvider = _
 
   private lazy val state: Option[State] = Option(stateProvider).flatMap(_.getRuleStatus(ruleName))
 
@@ -55,6 +56,8 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
 
   def getLastSeenTimestamp: Date = state.map(_.lastSeenTimestamp).orNull
 
+  private def mockTargets: Boolean = state.exists(_.mockTargets)
+
   def getMemorizedData: util.Map[_, _] =
     state
       .map(_.customData)
@@ -72,12 +75,25 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
   def error(message: Any): Unit = logger.error(message.toString)
 
   def hipchat(room: String, message: String, color: String, notify: Boolean): Unit =
-    hipChatTarget.send(room, message, color, notify)
+    if (mockTargets) {
+      logger.info(s"HipChat: room=$room message=$message color=$color notify=$notify")
+    } else {
+      hipChatTarget.send(room, message, color, notify)
+    }
 
   def email(recipient: String, subject: String, body: String): Unit =
-    emailTarget.send(recipient, subject, body)
+    if (mockTargets) {
+      logger.info(s"Email: recipient=$recipient subject=$subject body=$body")
+    } else {
+      emailTarget.send(recipient, subject, body)
+    }
 
-  def slack(channel: String, message: String): Unit = slackTarget.send(channel, message)
+  def slack(channel: String, message: String): Unit =
+    if (mockTargets) {
+      logger.info(s"Slack: channel=$channel message=$message")
+    } else {
+      slackTarget.send(channel, message)
+    }
 
   def reaction(cl: Closure[Unit]): Unit = {
     reactionWasCalled = true
@@ -109,7 +125,7 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
       )
 
       stateProvider.logRule(
-        State(
+        RuleState(
           ruleName,
           messages.filter(_.data.contains("id")).map(_.data("id").toString).toSet, // TODO "id" -> ???
           executionTime,

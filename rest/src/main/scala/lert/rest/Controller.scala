@@ -1,19 +1,23 @@
 package lert.rest
 
+import java.util.Date
 import javax.inject.Inject
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.typesafe.scalalogging.LazyLogging
 import io.undertow.server.{HttpHandler, HttpServerExchange}
 import io.undertow.util.{Headers, HttpString}
 import lert.core.config.ArgumentProvider
-import lert.core.rule.{RuleRunner, RuleSource}
+import lert.core.rule.{RuleRunner, RuleSource, ThreadAppender}
+import lert.core.state.{StateProvider, StaticStateProvider, TestRunState}
 
 class Controller @Inject()(objectMapper: ObjectMapper,
                            ruleSource: RuleSource,
                            argumentProvider: ArgumentProvider,
-                           ruleRunner: RuleRunner) extends HttpHandler {
+                           ruleRunner: RuleRunner,
+                           stateProvider: StateProvider) extends HttpHandler with LazyLogging {
 
-  override def handleRequest(exchange: HttpServerExchange) = {
+  override def handleRequest(exchange: HttpServerExchange): Unit = {
     setupCORS(exchange)
     exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "application/json")
     val reqPath = exchange.getRequestPath
@@ -26,13 +30,21 @@ class Controller @Inject()(objectMapper: ObjectMapper,
         exchange.getResponseSender.close()
       } else if (method == "POST") {
         exchange.getRequestReceiver.receiveFullString((exchange: HttpServerExchange, message: String) => {
-          val script = objectMapper.readValue(message, classOf[RunScriptRequest]).script
+
+          val request = objectMapper.readValue(message, classOf[RunScriptRequest])
+          ThreadAppender.startCapturing()
           try {
-            ruleRunner.process(script)
-            exchange.getResponseSender.send(ExecutionResult("OK").asJson)
+            ruleRunner.process(request.script, new StaticStateProvider(TestRunState(request.mockTargets)))
           } catch {
             case ex: Exception =>
-              exchange.getResponseSender.send(ExecutionResult(ex.getLocalizedMessage).asJson)
+              logger.error(ex.getLocalizedMessage)
+              logger.debug(ex.getLocalizedMessage, ex)
+          } finally {
+            exchange.getResponseSender.send(ExecutionResult(
+              ThreadAppender.getAndClear().map(e =>
+                LogEvent(new Date(e.getTimeStamp), e.getLevel.toString, e.getFormattedMessage)
+              )
+            ).asJson)
           }
         })
       }
@@ -55,22 +67,8 @@ class Controller @Inject()(objectMapper: ObjectMapper,
 
 }
 
-case class RunScriptRequest(script: String)
+case class RunScriptRequest(script: String, mockTargets: Boolean)
 
-case class ExecutionResult(log: String)
+case class ExecutionResult(log: Seq[LogEvent])
 
-//
-//class Service @Inject()(ruleRunner: RuleRunner) extends LazyLogging {
-//  implicit val strategy = Strategy.fromFixedDaemonPool(8, "fs2")
-//
-//  def runScript(script: String): Task[ExecutionResult] = {
-//    logger.info(Thread.currentThread().getName)
-//    Task {
-//      logger.info(Thread.currentThread().getName)
-//      ruleRunner.process(script)
-//      ExecutionResult("OK")
-//    }
-//  }
-//}
-//
-//
+case class LogEvent(time: Date, level: String, message: String)

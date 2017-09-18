@@ -13,3 +13,23 @@
 .content-container {
   padding-left: 20px;
 }
+
+.log-message-date {
+  background: #f6f6f6;
+}
+
+.log-message-ERROR {
+  background: #eeb2aa;
+}
+
+.log-message-WARN {
+  background: #eeecb4;
+}
+
+.checkbox input, .radio input {
+  display: inherit;
+}
+
+nav .checkbox {
+  display: inline-block;
+}
