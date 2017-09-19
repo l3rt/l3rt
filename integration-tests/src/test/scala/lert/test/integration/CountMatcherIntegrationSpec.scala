@@ -12,6 +12,9 @@ class CountMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
 
     val tempFile = Files.createTempFile("rule", ".out")
 
+    addMessage("test1")
+    addMessage("test1")
+
     prepareApplication(createTempRule(
       s"""
          |rule {
@@ -19,12 +22,12 @@ class CountMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
          |    params = [
          |            index: "logstash-*",
          |            matcher: "count",
-         |            timeframe: "10s",
+         |            timeframe: "15s",
          |            numberOfTimeframes: 3,
          |            filter: [:]
          |    ]
          |
-         |    skip = (new Date().getTime() - (lastExecutionTime?:new Date(0)).getTime() < 10000)
+         |    skip = (new Date().getTime() - (lastExecutionTime?:new Date(0)).getTime() < 15000)
          |
          |    reaction { messages ->
          |        messages.each {
@@ -35,14 +38,13 @@ class CountMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
          |}
       """.stripMargin))
 
-    addMessage("test1")
-    addMessage("test1")
-
-    sleep(5000)
-
-    addMessage("test1")
-
     sleep(15000)
+
+    addMessage("test1")
+
+    while (Files.readAllLines(tempFile).size() < 8) {
+      Thread.sleep(1000)
+    }
 
     assert(new String(Files.readAllBytes(tempFile)).trim ==
       """

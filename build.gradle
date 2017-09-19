@@ -11,9 +11,6 @@ subprojects {
         mavenCentral()
     }
 
-    sourceSets.main.scala.srcDir "src/main/java"
-    sourceSets.main.java.srcDirs = []
-
     dependencies {
         compile("org.scala-lang:scala-library:$scalaVersion",
                 "ch.qos.logback:logback-classic:$logbackVersion",

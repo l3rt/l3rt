@@ -3,8 +3,6 @@ package lert.test.integration
 import java.nio.file.{Files, Path}
 import java.util.{Collections, Date, UUID}
 
-import scala.collection.mutable.ListBuffer
-
 import com.dimafeng.testcontainers.{ForEachTestContainer, GenericContainer}
 import com.typesafe.scalalogging.LazyLogging
 import lert.Application
@@ -15,6 +13,8 @@ import org.apache.commons.io.FileUtils
 import org.apache.http.entity.ContentType
 import org.apache.http.nio.entity.NStringEntity
 import org.elasticsearch.client.RestClient
+
+import scala.collection.mutable.ListBuffer
 
 class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer with LazyLogging {
   override val container = GenericContainer(
@@ -64,7 +64,6 @@ class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer wi
   protected def stopApplication() = {
     files.map(_.toFile).foreach(FileUtils.deleteQuietly)
     files.clear()
-    ???
-    //Application.taskManager.stop()
+    Application.taskManager.stop()
   }
 }

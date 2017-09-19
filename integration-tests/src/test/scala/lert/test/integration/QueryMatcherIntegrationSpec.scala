@@ -28,7 +28,7 @@ class QueryMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
          |            ]
          |    ]
          |
-           |    reaction { messages ->
+         |    reaction { messages ->
          |        messages.each {
          |            file("${tempFile.toString}", "Message: " + it.data.toString())
          |        }

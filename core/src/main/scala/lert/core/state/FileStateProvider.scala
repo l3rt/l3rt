@@ -14,7 +14,7 @@ class FileStateProvider @Inject()(objectMapper: ObjectMapper, configProvider: Co
 
   override def getRuleStatus(ruleName: String): Option[State] = {
     try {
-      Some(objectMapper.readValue(Files.readAllBytes(ruleNameToPath(ruleName)), classOf[State]))
+      Some(objectMapper.readValue(Files.readAllBytes(ruleNameToPath(ruleName)), classOf[RuleState]))
     } catch {
       case ex: Exception =>
         logger.warn(s"Couldn't read previous rule's [$ruleName] status: ${ex.getLocalizedMessage}")

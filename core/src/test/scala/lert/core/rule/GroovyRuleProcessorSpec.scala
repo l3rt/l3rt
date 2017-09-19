@@ -1,30 +1,28 @@
 package lert.core.rule
 
-import java.io.ByteArrayInputStream
 import java.util.{Collections, Date}
 
-import scala.collection.mutable.ListBuffer
-
-import lert.core.config.{Config, ConfigProvider, SimpleConfigProvider, Source}
-import lert.core.processor.{AlertMessage, LastSeenData, Processor}
-import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget, TargetHelper}
-import lert.core.{BaseSpec, ProcessorLoader}
 import com.google.inject.Injector
 import groovy.lang.Closure
+import lert.core.config.{Config, ConfigProvider, SimpleConfigProvider, Source}
+import lert.core.processor.{AlertMessage, LastSeenData, Processor}
 import lert.core.rule.GroovyRuleProcessorSpec.RuleDelegateWithSink
-import lert.core.state.{State, StateProvider}
+import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget}
+import lert.core.state.{RuleState, State, StateProvider}
+import lert.core.{BaseSpec, ProcessorLoader}
 import org.mockito.Matchers._
-import org.mockito.{ArgumentCaptor, Mockito}
 import org.mockito.Mockito.{spy, verify, when}
+import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatest.mockito.MockitoSugar._
+
+import scala.collection.mutable.ListBuffer
 
 class GroovyRuleProcessorSpec extends BaseSpec {
   it should "run the script" in {
     val processor = processorMock(Seq(AlertMessage(Map("test" -> Map("1" -> "2"), "id" -> "1"))))
     val delegate = spy(new RuleDelegateWithSink(
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
-      processorLoader = processorLoaderMock(processor),
-      stateProvider = stateProviderMock("testrule")
+      processorLoader = processorLoaderMock(processor)
     ))
     runRule(
       """
@@ -37,7 +35,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
         | }
         |}
       """.stripMargin,
-      delegate
+      delegate,
+      stateProviderMock("testrule")
     )
 
     assert(delegate.sourceName == "test")
@@ -49,8 +48,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     val processor = processorMock(Seq())
     val delegate = spy(new RuleDelegateWithSink(
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
-      processorLoader = processorLoaderMock(processor),
-      stateProvider = stateProviderMock("testrule")
+      processorLoader = processorLoaderMock(processor)
     ))
     assertThrows[IllegalStateException] {
       runRule(
@@ -60,7 +58,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
           |}
         """.
           stripMargin,
-        delegate
+        delegate,
+        stateProviderMock("testrule")
       )
     }
   }
@@ -69,8 +68,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     val processor = processorMock(Seq())
     val delegate = spy(new RuleDelegateWithSink(
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
-      processorLoader = processorLoaderMock(processor),
-      stateProvider = stateProviderMock("testrule")
+      processorLoader = processorLoaderMock(processor)
     ))
     assertThrows[IllegalArgumentException] {
       runRule(
@@ -82,7 +80,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
           |}
         """.
           stripMargin,
-        delegate
+        delegate,
+        stateProviderMock("testrule")
       )
     }
   }
@@ -93,8 +92,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     val delegate = spy(new RuleDelegateWithSink(
       hipChatTarget = hipChatTarget,
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
-      processorLoader = processorLoaderMock(processor),
-      stateProvider = stateProviderMock("testrule")
+      processorLoader = processorLoaderMock(processor)
     ))
     runRule(
       """
@@ -106,7 +104,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
         |}
       """.
         stripMargin,
-      delegate
+      delegate,
+      stateProviderMock("testrule")
     )
 
     verify(hipChatTarget).send("room", "message", "color", true)
@@ -119,7 +118,6 @@ class GroovyRuleProcessorSpec extends BaseSpec {
       emailTarget = emailTarget,
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
       processorLoader = processorLoaderMock(processor),
-      stateProvider = stateProviderMock("testrule")
     ))
     runRule(
       """
@@ -131,7 +129,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
         |}
       """.
         stripMargin,
-      delegate
+      delegate,
+      stateProviderMock("testrule")
     )
 
     verify(emailTarget).send("recipient", "subj", "body")
@@ -141,7 +140,6 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     val processor = processorMock(Seq())
 
     val delegate = spy(new RuleDelegateWithSink(
-      stateProvider = stateProviderMock("testrule", Some(State("testrule", Set("1"), new Date(4321), "2", new Date(1234)))),
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
       processorLoader = processorLoaderMock(processor)
     ))
@@ -160,7 +158,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
         |}
       """.
         stripMargin,
-      delegate
+      delegate,
+      stateProviderMock("testrule", Some(RuleState("testrule", Set("1"), new Date(4321), "2", new Date(1234))))
     )
 
     assert(delegate.sink == Seq(new Date(4321), Collections.singleton("1"), "2", new Date(1234)))
@@ -171,7 +170,6 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     val delegate = spy(new RuleDelegateWithSink(
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
       processorLoader = processorLoaderMock(processor),
-      stateProvider = stateProviderMock("testrule")
     ))
     runRule(
       """
@@ -184,7 +182,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
         |}
       """.
         stripMargin,
-      delegate
+      delegate,
+      stateProviderMock("testrule")
     )
 
     assert(delegate.sink == Seq())
@@ -196,7 +195,6 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     val delegate = spy(new RuleDelegateWithSink(
       configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
       processorLoader = processorLoaderMock(processor),
-      stateProvider = stateProvider
     ))
     runRule(
       """
@@ -208,7 +206,8 @@ class GroovyRuleProcessorSpec extends BaseSpec {
         |}
       """.
         stripMargin,
-      delegate
+      delegate,
+      stateProvider
     )
 
     val stateCaptor = ArgumentCaptor.forClass(classOf[State])
@@ -239,14 +238,14 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     override def load(sourceType: String): Processor = processor
   }
 
-  private def runRule(rule: String, delegate: RuleDelegate) = {
+  private def runRule(rule: String, delegate: RuleDelegate, stateProvider: StateProvider) = {
     val injector = mock[Injector]
-    TargetHelper.setInjector(injector)
     when(injector.getInstance(classOf[RuleDelegate])).thenReturn(delegate)
 
-    new GroovyRuleRunner().process(new ByteArrayInputStream(
-      rule.getBytes()
-    ))
+    new GroovyRuleRunner(injector).process(
+      rule,
+      stateProvider
+    )
   }
 }
 
@@ -256,14 +255,12 @@ object GroovyRuleProcessorSpec {
                              emailTarget: EmailTarget = null,
                              slackTarget: SlackTarget = null,
                              configProvider: ConfigProvider = null,
-                             processorLoader: ProcessorLoader = null,
-                             stateProvider: StateProvider = null) extends RuleDelegate(
+                             processorLoader: ProcessorLoader = null) extends RuleDelegate(
     hipChatTarget,
     emailTarget,
     slackTarget,
     configProvider,
-    processorLoader,
-    stateProvider
+    processorLoader
   ) {
 
     val sink: ListBuffer[Any] = ListBuffer[Any]()

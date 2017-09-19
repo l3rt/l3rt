@@ -21,11 +21,15 @@ trait RuleSource {
 class FolderRuleSource extends RuleSource {
   override def load(location: String): Seq[Rule] = {
     val path = Paths.get(location)
-    Files
-      .newDirectoryStream(path)
-      .asScala
-      .map { p =>
-        Rule(path.relativize(p).toString, new String(Files.readAllBytes(p)))
-      }.toSeq
+    if (Files.isDirectory(path)) {
+      Files
+        .newDirectoryStream(path)
+        .asScala
+        .map { p =>
+          Rule(path.relativize(p).toString, new String(Files.readAllBytes(p)))
+        }.toSeq
+    } else {
+      Seq(Rule(path.getFileName.toString, new String(Files.readAllBytes(path))))
+    }
   }
 }
