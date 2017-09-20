@@ -1,11 +1,12 @@
 package lert.rest
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Injector, Singleton}
 import com.typesafe.scalalogging.LazyLogging
 import io.undertow.Undertow
+import lert.core.utils.ClosableModule
 import net.codingwell.scalaguice.ScalaModule
 
-class RestModule extends ScalaModule {
+class RestModule extends ScalaModule with ClosableModule {
 
   override def configure(): Unit = {
     requestInjection(this)
@@ -14,16 +15,25 @@ class RestModule extends ScalaModule {
   @Inject def initTaskManager(instance: Server): Unit = {
     instance.start()
   }
+
+  override def close(injector: Injector): Unit = {
+    injector.getInstance(classOf[Server]).stop()
+  }
 }
 
+@Singleton
 class Server @Inject()(controller: Controller) extends LazyLogging {
-  def start() = {
+  var server: Undertow = _
+
+  def start(): Unit = {
     logger.info("HTTP server is being started")
 
-    val server = Undertow.builder
+    server = Undertow.builder
       .addHttpListener(8080, "localhost", controller)
       .build
 
     server.start()
   }
+
+  def stop(): Unit = server.stop()
 }

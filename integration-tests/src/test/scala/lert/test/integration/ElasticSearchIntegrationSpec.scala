@@ -64,6 +64,6 @@ class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer wi
   protected def stopApplication() = {
     files.map(_.toFile).foreach(FileUtils.deleteQuietly)
     files.clear()
-    Application.taskManager.stop()
+    Application.stopApplication()
   }
 }

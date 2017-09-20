@@ -2,11 +2,12 @@ package lert.core
 
 import java.util.concurrent.{Executors, TimeUnit}
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import com.typesafe.scalalogging.LazyLogging
 import lert.core.config.{ArgumentProvider, ConfigProvider}
 import lert.core.rule.RuleLoader
 
+@Singleton
 class TaskManager @Inject()(configProvider: ConfigProvider, task: Task) extends LazyLogging {
   private val scheduler = Executors.newSingleThreadScheduledExecutor()
 
