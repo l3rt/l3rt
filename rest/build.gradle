@@ -8,6 +8,11 @@ dependencies {
 }
 
 task buildClient(type: com.dimafeng.containerizedtasks.NpmContainerizedTask) {
+    doFirst {
+        if (gradle.taskGraph.getAllTasks().find { it.getName().endsWith("buildDocker") } == null) {
+            throw new StopExecutionException()
+        }
+    }
     sourcesDir = '../client'
     imageName = 'node:6.11.3'
     scriptBody = """
