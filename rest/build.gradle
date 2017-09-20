@@ -1,4 +1,24 @@
+plugins {
+    id 'com.dimafeng.containerizedTask' version '0.5.1'
+}
+
 dependencies {
     compile("io.undertow:undertow-core:$undertowVersion")
     compile project(":core")
 }
+
+task buildClient(type: com.dimafeng.containerizedtasks.NpmContainerizedTask) {
+    sourcesDir = '../client'
+    imageName = 'node:6.11.3'
+    scriptBody = """
+                |npm install --unsafe-perm
+                |npm run build
+                """.stripMargin()
+}
+
+task copyClientSide(type: Sync, dependsOn: buildClient) {
+    from '../client/out'
+    into "src/main/resources/"
+}
+
+processResources.dependsOn(copyClientSide)

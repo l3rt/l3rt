@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import {Provider} from 'mobx-react';
 import {Menu} from './route/Menu';
 import {RouteStore, SCRIPTS_MAPPING} from './route/RouteStore';

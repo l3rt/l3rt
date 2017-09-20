@@ -1,3 +1,4 @@
+
 package lert.rest
 
 import java.util.Date
@@ -5,6 +6,7 @@ import javax.inject.Inject
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.LazyLogging
+import io.undertow.server.handlers.resource.{ClassPathResourceManager, ResourceHandler}
 import io.undertow.server.{HttpHandler, HttpServerExchange}
 import io.undertow.util.{Headers, HttpString}
 import lert.core.config.ArgumentProvider
@@ -19,16 +21,18 @@ class Controller @Inject()(objectMapper: ObjectMapper,
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     setupCORS(exchange)
-    exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "application/json")
+
     val reqPath = exchange.getRequestPath
     val method = exchange.getRequestMethod.toString
 
     if (reqPath == "/rules" && (method == "GET" || method == "OPTIONS")) {
       exchange.getResponseSender.send(ruleSource.load(argumentProvider.arguments.rules).asJson)
+      exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "application/json")
     } else if (reqPath == "/runScript") {
       if (method == "OPTIONS") {
         exchange.getResponseSender.close()
       } else if (method == "POST") {
+        exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "application/json")
         exchange.getRequestReceiver.receiveFullString((exchange: HttpServerExchange, message: String) => {
 
           val request = objectMapper.readValue(message, classOf[RunScriptRequest])
@@ -48,6 +52,12 @@ class Controller @Inject()(objectMapper: ObjectMapper,
           }
         })
       }
+    } else if (reqPath == "/") {
+      exchange.setStatusCode(302)
+      exchange.getResponseHeaders.add(new HttpString("Location"), "/public/index.html")
+      exchange.getResponseSender.close()
+    } else if (reqPath.startsWith("/")) {
+      new ResourceHandler(new ClassPathResourceManager(this.getClass.getClassLoader)).handleRequest(exchange)
     } else {
       exchange.setStatusCode(404)
       exchange.getResponseSender.send("Not found!")
