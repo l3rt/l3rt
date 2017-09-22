@@ -25,6 +25,12 @@ Supported rules:
 * ElasticSearch: [count rule](docs/elasticsearchCountRule.md) - returns number of events occurred for the given period of time
 * Missing yours? Add a [feature request](http://feathub.com/l3rt/l3rt) or submit a pull request 
 
+## UI
+
+You can use a web UI to create and debug your rules. Just start L3rt and go to http://localhost:8080/
+
+![ui](UI.png)
+
 ## How to use
 
 Create a config file where you need to specify common configuration for all your rules:
