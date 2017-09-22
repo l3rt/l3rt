@@ -3,7 +3,7 @@ import {observer} from 'mobx-react';
 import {diInject} from '../app/DIContext';
 import {ScriptStore, ScriptViewStore} from './ScriptStore';
 import AceEditor from 'react-ace';
-import {DropdownButton, MenuItem, Button, Checkbox} from 'react-bootstrap';
+import {DropdownButton, MenuItem, Button, Checkbox, Panel, Modal, Alert} from 'react-bootstrap';
 import 'brace/mode/groovy';
 import 'brace/theme/tomorrow';
 import FontAwesome = require('react-fontawesome');
@@ -29,49 +29,64 @@ export class ScriptView extends React.Component<Props, any> {
                     <div className="container-fluid">
                         <DropdownButton title={this.viewStore.selectedRuleId || 'Select a Rule'} id="scriptDropdown"
                                         onSelect={this.viewStore.selectRule}>
-                            {this.viewStore.rules.map(r => <MenuItem eventKey={r}>{r.id}</MenuItem>)}
+                            {this.viewStore.rules.map(r => <MenuItem eventKey={r} key={r.id}>{r.id}</MenuItem>)}
                         </DropdownButton>
 
                         <Checkbox checked={this.viewStore.mockTargets} onChange={this.viewStore.setMockTargets}>
                             Log targets
-                        </Checkbox>
+                        </Checkbox>&nbsp;
 
-                        <Button onClick={this.viewStore.runScript}><FontAwesome name="play"/></Button>
+                        <Button onClick={this.viewStore.runScript}><FontAwesome name="play"/></Button>&nbsp;
+                        <Button onClick={this.viewStore.saveDialog}><FontAwesome name="save"/></Button>
                     </div>
                 </nav>
 
                 <div className="content">
                     <div className="row">
                         <div className="col-md-6">
-                            <div className="card">
-                                <div className="content">
-                                    <AceEditor mode="groovy"
-                                               theme="tomorrow"
-                                               name="codeEditor"
-                                               value={this.viewStore.selectedRuleScript}
-                                               onChange={this.viewStore.updateScript}/>
-                                </div>
-                            </div>
-
+                            <Panel>
+                                <AceEditor mode="groovy"
+                                           theme="tomorrow"
+                                           name="codeEditor"
+                                           value={this.viewStore.selectedRuleScript}
+                                           onChange={this.viewStore.updateScript}/>
+                            </Panel>
                         </div>
 
                         <div className="col-md-6">
-                            <div className="card">
-                                <div className="content">
-                                    {this.viewStore.runStatus.map(l =>
-                                        <div key={l.time + l.message} className="row">
-                                            <div
-                                                className="col-md-4 log-message-date">{new Date(l.time).toISOString()}</div>
-                                            <div className={'col-md-8 log-message-' + l.level}>
-                                                [{l.level}] {l.message}</div>
-                                        </div>
-                                    )}
+                            <Panel>
+                                <div>
+                                    <h2>Execution Log</h2>
                                 </div>
-                            </div>
-
+                                {this.viewStore.runStatus.map((l, i) =>
+                                    <div key={i} className="row">
+                                        <div
+                                            className="col-md-4 log-message-date">{new Date(l.time).toISOString()}</div>
+                                        <div className={'col-md-8 log-message-' + l.level}>
+                                            [{l.level}] {l.message}</div>
+                                    </div>
+                                )}
+                            </Panel>
                         </div>
                     </div>
                 </div>
+
+                <Modal
+                    show={this.viewStore.showSaveDialog} onHide={this.viewStore.closeSaveDialog}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Save Rule</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {(this.viewStore.saveError) ? <Alert bsStyle="danger">{this.viewStore.saveError}</Alert> : null}
+
+                        Rule name&nbsp; <input value={this.viewStore.ruleName}
+                                               onChange={this.viewStore.changeRuleName}/>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={this.viewStore.saveRule}>Save</Button>
+                        <Button onClick={this.viewStore.closeSaveDialog}>Cancel</Button>
+                    </Modal.Footer>
+                </Modal>
             </div>);
     }
 }

@@ -1,7 +1,6 @@
-export interface RunRequest {
+export interface Rule {
   id: string;
   script: string;
-  mockTargets: boolean;
 }
 
 export interface ExecutionResult {

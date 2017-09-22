@@ -15,10 +15,22 @@ class RuleLoader @Inject()(ruleRunner: RuleRunner, ruleSource: RuleSource, state
 case class Rule(id: String, script: String)
 
 trait RuleSource {
+  def save(location: String, rule: Rule): Unit = throw new NotImplementedError(s"${this.getClass.getSimpleName} doesn't support rule saving")
+
   def load(location: String): Seq[Rule]
 }
 
 class FolderRuleSource extends RuleSource {
+
+  override def save(location: String, rule: Rule): Unit = {
+    val path = Paths.get(location)
+    if (Files.isDirectory(path)) {
+      Files.write(Paths.get(location, rule.id), Option(rule.script).getOrElse("").getBytes)
+    } else {
+      throw new IllegalAccessException(s"Couldn't save the rule to $location because it's not a folder")
+    }
+  }
+
   override def load(location: String): Seq[Rule] = {
     val path = Paths.get(location)
     if (Files.isDirectory(path)) {

@@ -19,7 +19,8 @@
     "@types/react-router-bootstrap": "0.23.02",
     "@types/react-router-dom": "4.0.0",
     "bootstrap": "3.3.7",
-    "brace": "^0.10.0",
+    "brace": "0.10.0",
+    "flat-ui": "2.1.1",
     "font-awesome": "4.7.0",
     "history": "4.5.1",
     "mobx": "3.1.7",
@@ -35,7 +36,7 @@
     "react-router-dom": "4.0.0",
     "rx": "4.1.0",
     "ts-option": "1.1.2",
-    "ts-rx-rest": "0.7.0"
+    "ts-rx-rest": "0.9.0"
   },
   "jest": {
     "transform": {

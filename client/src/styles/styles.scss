@@ -1,17 +1,15 @@
-.sidebar, body > .navbar-collapse {
-  width: 80px;
+body {
+  font-size: 14px;
 }
 
-.sidebar .sidebar-wrapper, body > .navbar-collapse .sidebar-wrapper {
-  width: 80px;
+h1 {
+  font-size: 1.8em;
 }
-
-.main-panel {
-  width: calc(100% - 80px);
+h2 {
+  font-size: 1.6em;
 }
-
-.content-container {
-  padding-left: 20px;
+h3 {
+  font-size: 1.4em;
 }
 
 .log-message-date {

@@ -10,7 +10,7 @@ import io.undertow.server.handlers.resource.{ClassPathResourceManager, ResourceH
 import io.undertow.server.{HttpHandler, HttpServerExchange}
 import io.undertow.util.{Headers, HttpString}
 import lert.core.config.ArgumentProvider
-import lert.core.rule.{RuleRunner, RuleSource, ThreadAppender}
+import lert.core.rule.{Rule, RuleRunner, RuleSource, ThreadAppender}
 import lert.core.state.{StateProvider, StaticStateProvider, TestRunState}
 
 class Controller @Inject()(objectMapper: ObjectMapper,
@@ -25,9 +25,21 @@ class Controller @Inject()(objectMapper: ObjectMapper,
     val reqPath = exchange.getRequestPath
     val method = exchange.getRequestMethod.toString
 
-    if (reqPath == "/rules" && (method == "GET" || method == "OPTIONS")) {
-      exchange.getResponseSender.send(ruleSource.load(argumentProvider.arguments.rules).asJson)
+    if (reqPath == "/rules") {
       exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "application/json")
+
+      if (method == "GET") {
+        exchange.getResponseSender.send(ruleSource.load(argumentProvider.arguments.rules).asJson)
+      } else if (method == "POST") {
+        exchange.getRequestReceiver.receiveFullString((exchange: HttpServerExchange, message: String) => {
+          val rule = objectMapper.readValue(message, classOf[Rule])
+          ruleSource.save(argumentProvider.arguments.rules, rule)
+          exchange.setStatusCode(204)
+          exchange.getResponseSender.close()
+        })
+      } else {
+        exchange.getResponseSender.close()
+      }
     } else if (reqPath == "/runScript") {
       if (method == "OPTIONS") {
         exchange.getResponseSender.close()
