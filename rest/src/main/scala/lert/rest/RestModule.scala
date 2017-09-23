@@ -29,7 +29,7 @@ class Server @Inject()(controller: Controller) extends LazyLogging {
     logger.info("HTTP server is being started")
 
     server = Undertow.builder
-      .addHttpListener(8080, "localhost", controller)
+      .addHttpListener(8080, "0.0.0.0", controller)
       .build
 
     server.start()

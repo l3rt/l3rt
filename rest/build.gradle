@@ -1,6 +1,13 @@
-plugins {
-    id 'com.dimafeng.containerizedTask' version '0.5.1'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.dimafeng:containerized-tasks:0.5.2"
+    }
 }
+
+apply plugin: "com.dimafeng.containerizedTask"
 
 dependencies {
     compile("io.undertow:undertow-core:$undertowVersion")
