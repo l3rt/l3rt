@@ -97,17 +97,19 @@ rule {
 
 ## Build & Launch 
 
+### Manually 
+
 1. Build
 `./gradlew application:jar `
 
 2. Run
 `java -jar ./application/build/libs/l3rt-0.1.2.jar --config ~/conf.json --rules /opt/l3rt/rules/`
 
-NOTE: l3rt requires >= Java 8
+NOTE: l3rt requires >= Java 8 and Docker
 
-### or Docker
+### Via Docker
 
-Create your config `~/conf.json` and put all your rules inside `~/rules` on your local machine. Then start it as follows:
+Create your config file `~/conf.json` on your local machine. Then start it as follows:
 
 `docker run -it -v ~/conf.json:/l3rt/config/config.json -p 8080:8080 dimafeng/l3rt:0.1.2`
 
