@@ -36,7 +36,7 @@ task buildDocker(type: Docker) {
     exposePort(8080)
     runCommand("mkdir /l3rt")
     runCommand("mkdir /l3rt/rules/")
-    push = false
+    push = !project.hasProperty('noDockerPush')
     applicationName = 'lert'
     addFile jar.archivePath, '/opt/l3rt.jar'
     tag = "dimafeng/l3rt"
