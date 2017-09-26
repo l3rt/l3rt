@@ -48,13 +48,13 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
   @BeanProperty
   var memorize: java.util.Map[String, _] = new util.HashMap[String, Any]()
 
-  def getLastExecutionTime: Date = state.map(_.lastExecutionTime).orNull
+  def getLastExecutionTime: Date = state.map(_.lastExecutionTime).getOrElse(new Date(0))
 
   def getLastProcessedId: util.Set[String] = state.map(_.lastProcessedIds.asJava).orNull
 
   def getLastSeenId: String = state.map(_.lastSeenId).orNull
 
-  def getLastSeenTimestamp: Date = state.map(_.lastSeenTimestamp).orNull
+  def getLastSeenTimestamp: Date = state.map(_.lastSeenTimestamp).getOrElse(new Date())
 
   private def mockTargets: Boolean = state.exists(_.mockTargets)
 

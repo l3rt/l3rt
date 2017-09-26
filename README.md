@@ -74,7 +74,7 @@ rule {
             "query": [query: [
                             bool: [
                                 must: [
-                                        ["range": ["@timestamp": ["gt": [lastSeenTimestamp?: new Date()]]]],
+                                        ["range": ["@timestamp": ["gt": lastSeenTimestamp]]],
                                         ["match": [ "message": "error" ]]
                                     ]
                                 ]
