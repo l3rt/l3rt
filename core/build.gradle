@@ -4,7 +4,8 @@ dependencies {
             "io.evanwong.oss:hipchat-java:$hipchatVersion",
             "com.sun.mail:javax.mail:$javaxMailVersion",
             //"org.telegram:telegrambots:3.2",
-            "com.squareup.okhttp3:okhttp:$okhttpVersion")
+            "com.squareup.okhttp3:okhttp:$okhttpVersion",
+            "com.github.pureconfig:pureconfig_2.12:$pureconfigVersion")
 
 
     testCompile("org.jvnet.mock-javamail:mock-javamail:$mockJavamailVersion")

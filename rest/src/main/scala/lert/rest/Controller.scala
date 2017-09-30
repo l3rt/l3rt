@@ -9,13 +9,13 @@ import com.typesafe.scalalogging.LazyLogging
 import io.undertow.server.handlers.resource.{ClassPathResourceManager, ResourceHandler}
 import io.undertow.server.{HttpHandler, HttpServerExchange}
 import io.undertow.util.{Headers, HttpString}
-import lert.core.config.ArgumentProvider
+import lert.core.config.ConfigProvider
 import lert.core.rule.{Rule, RuleRunner, RuleSource, ThreadAppender}
 import lert.core.state.{StateProvider, StaticStateProvider, TestRunState}
 
 class Controller @Inject()(objectMapper: ObjectMapper,
                            ruleSource: RuleSource,
-                           argumentProvider: ArgumentProvider,
+                           configProvider: ConfigProvider,
                            ruleRunner: RuleRunner,
                            stateProvider: StateProvider) extends HttpHandler with LazyLogging {
 
@@ -29,11 +29,11 @@ class Controller @Inject()(objectMapper: ObjectMapper,
       exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, "application/json")
 
       if (method == "GET") {
-        exchange.getResponseSender.send(ruleSource.load(argumentProvider.arguments.rules).asJson)
+        exchange.getResponseSender.send(ruleSource.load(configProvider.config.rules).asJson)
       } else if (method == "POST") {
         exchange.getRequestReceiver.receiveFullString((exchange: HttpServerExchange, message: String) => {
           val rule = objectMapper.readValue(message, classOf[Rule])
-          ruleSource.save(argumentProvider.arguments.rules, rule)
+          ruleSource.save(configProvider.config.rules, rule)
           exchange.setStatusCode(204)
           exchange.getResponseSender.close()
         })

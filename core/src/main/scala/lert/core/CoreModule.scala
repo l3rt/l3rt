@@ -1,13 +1,11 @@
-package lert
+package lert.core
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.google.inject.multibindings.Multibinder
 import com.google.inject.{Inject, Injector, Singleton}
+import com.google.inject.multibindings.Multibinder
 import com.typesafe.scalalogging.LazyLogging
-import lert.Application.injector
-import lert.Core.BASE_PACKAGE
-import lert.core.TaskManager
+import lert.core.Core.BASE_PACKAGE
 import lert.core.cache.{GlobalCache, GuavaCache}
 import lert.core.config._
 import lert.core.processor.Processor
@@ -19,7 +17,7 @@ import org.reflections.Reflections
 
 import scala.collection.JavaConverters._
 
-class ApplicationModule(args: Array[String]) extends ScalaModule with LazyLogging with ClosableModule {
+class CoreModule extends ScalaModule with LazyLogging with ClosableModule {
 
   override def configure(): Unit = {
     bind[RuleRunner].to[GroovyRuleRunner]
@@ -30,10 +28,9 @@ class ApplicationModule(args: Array[String]) extends ScalaModule with LazyLoggin
     bind[StateProvider].to[FileStateProvider]
     bind[GlobalCache].to[GuavaCache].in[Singleton]
 
-    bind[Array[String]].annotatedWithName("args").toInstance(args)
     bind[ConfigParser].to[JsonConfigParser]
 
-    bind[ConfigProvider].to[FileConfigProvider]
+    bind[ConfigProvider].to[PureConfigProvider]
     bind[RuleSource].to[FolderRuleSource]
 
     logger.info("Dynamically loaded processors:")
@@ -48,10 +45,21 @@ class ApplicationModule(args: Array[String]) extends ScalaModule with LazyLoggin
   }
 
   @Inject def initTaskManager(instance: TaskManager): Unit = {
-    instance.start()
+    try {
+      instance.start()
+    } catch {
+      case ex: Exception =>
+        logger.error(ex.getLocalizedMessage)
+        logger.debug(ex.getLocalizedMessage, ex)
+        System.exit(1)
+    }
   }
 
   override def close(injector: Injector): Unit = {
     injector.getInstance(classOf[TaskManager]).stop()
   }
+}
+
+object Core {
+  final val BASE_PACKAGE = "lert"
 }

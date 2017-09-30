@@ -3,12 +3,13 @@ package lert.core.config
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-case class Config(delay: Int = 0,
+case class Config(delay: Int = 5000,
+                  rules: String = null,
                   sources: Seq[Source] = null,
                   targetSettings: TargetSettings = null,
                   home: String = null)
 
-case class Source(name: String, sourceType: String, params: Map[String, String])
+case class Source(name: Option[String] = None, url: String, params: Option[Map[String, String]] = None)
 
 case class TargetSettings(hipchat: HipchatSettings = null,
                           mailServer: MailServerSettings = null,

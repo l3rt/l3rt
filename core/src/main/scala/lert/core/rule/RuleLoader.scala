@@ -2,13 +2,28 @@ package lert.core.rule
 
 import java.nio.file.{Files, Paths}
 
-import scala.collection.JavaConverters._
 import com.google.inject.Inject
+import com.typesafe.scalalogging.LazyLogging
 import lert.core.state.StateProvider
+import org.slf4j.MDC
 
-class RuleLoader @Inject()(ruleRunner: RuleRunner, ruleSource: RuleSource, stateProvider: StateProvider) {
+import scala.collection.JavaConverters._
+
+class RuleLoader @Inject()(ruleRunner: RuleRunner, ruleSource: RuleSource, stateProvider: StateProvider) extends LazyLogging {
   def process(rule: String): Unit = {
-    ruleSource.load(rule).foreach { case Rule(_, script) => ruleRunner.process(script, stateProvider) }
+    ruleSource
+      .load(rule)
+      .foreach { case Rule(id, script) =>
+        MDC.put("ruleId", id)
+
+        try ruleRunner.process(script, stateProvider)
+        catch {
+          case ex: Exception =>
+            logger.error(ex.getLocalizedMessage)
+        }
+
+        MDC.clear()
+      }
   }
 }
 

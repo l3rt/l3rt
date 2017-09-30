@@ -1,14 +1,12 @@
 package lert.core.rule.target
 
-import java.util.Properties
 import javax.inject.Inject
 import javax.mail._
-import javax.mail.internet.InternetAddress
-import javax.mail.internet.MimeMessage
+import javax.mail.internet.{InternetAddress, MimeMessage}
 
+import com.typesafe.scalalogging.LazyLogging
 import lert.core.config.ConfigProvider
 import lert.core.utils.JavaUtils
-import com.typesafe.scalalogging.LazyLogging
 
 class EmailTarget @Inject()(configProvider: ConfigProvider) extends LazyLogging {
   def send(recipient: String, subject: String, body: String): Unit = {

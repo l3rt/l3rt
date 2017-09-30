@@ -24,7 +24,12 @@ class CountMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
          |            matcher: "count",
          |            timeframe: "15s",
          |            numberOfTimeframes: 3,
-         |            filter: [:]
+         |            filter: [:],
+         |            config: [
+         |                    sources: [
+         |                            ["url": "elasticSearch:http://localhost:${container.mappedPort(9200)}"]
+         |                    ]
+         |            ]
          |    ]
          |
          |    skip = (new Date().getTime() - (lastExecutionTime?:new Date(0)).getTime() < 15000)

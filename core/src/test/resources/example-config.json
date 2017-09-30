@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "url": "elasticSearch:http://localhost:9200"
+    }
+  ],
+  "rules": "/lert/rules/",
+  "targetSettings": {
+    "hipchat": {
+      "accessToken": "test",
+      "baseUrl": "test"
+    }
+  }
+}

@@ -23,7 +23,12 @@ class QueryMatcherIntegrationSpec extends ElasticSearchIntegrationSpec {
          |            "index": "logstash-*",
          |            "query": [
          |                    query: [
-         |                        range: ["@timestamp": [gt: lastSeenTimestamp?: new Date($now)]]
+         |                        range: ["@timestamp": [gt: lastSeenTimestamp]]
+         |                    ]
+         |            ],
+         |            config: [
+         |                    sources: [
+         |                            ["url": "elasticSearch:http://localhost:${container.mappedPort(9200)}"]
          |                    ]
          |            ]
          |    ]

@@ -38,15 +38,7 @@ Create a config file where you need to specify common configuration for all your
 ```json
 {
   "sources": [
-    {
-      "name": "elasticTest",
-      "sourceType": "lert.elasticsearch.ElasticSearchProcessor",
-      "params": {
-        "host": "localhost",
-        "port": "9200",
-        "schema": "http"
-      }
-    }
+    {"url": "elasticSearch:http://localhost:9200"}
   ],
   "targetSettings": {
     "mailServer": {

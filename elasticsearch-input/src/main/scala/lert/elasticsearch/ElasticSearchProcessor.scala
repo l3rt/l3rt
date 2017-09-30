@@ -1,12 +1,12 @@
 package lert.elasticsearch
 
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util
 import java.util.{Collections, TimeZone}
 import javax.inject.Inject
 
 import scala.collection.JavaConverters._
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.LazyLogging
@@ -24,11 +24,6 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
                                        matchers: util.Set[Matcher]) extends Processor with LazyLogging {
 
   override def loadMessages(ruleName: String, source: Source, params: Map[String, Any]): Seq[AlertMessage] = {
-    require(source.sourceType == classOf[ElasticSearchProcessor].getName)
-    require(source.params.contains(PARAM_HOST), s"$PARAM_HOST is not found in $source")
-    require(source.params.contains(PARAM_PORT), s"$PARAM_PORT is not found in $source")
-    require(source.params.contains(PARAM_SCHEMA), s"$PARAM_SCHEMA is not found in $source")
-
     val matcher = matchers.asScala.find(_.supports(params))
       .getOrElse(throw new IllegalArgumentException(s"Couldn't find a matcher for $params"))
 
@@ -56,12 +51,15 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
   }
 
   protected def restClient(source: Source): RestClient = {
+    val url = new URI(source.url.substring(SOURCE_URL_PREFIX.length))
     cache.get(
       "elasticRestClient",
       source,
-      RestClient.builder(new HttpHost(source.params(PARAM_HOST), source.params(PARAM_PORT).toInt, source.params(PARAM_SCHEMA))).build()
+      RestClient.builder(new HttpHost(url.getHost, url.getPort, url.getScheme)).build()
     )
   }
+
+  def supports(source: Source): Boolean = source.url.startsWith(SOURCE_URL_PREFIX)
 }
 
 object ElasticSearchProcessor {
@@ -76,6 +74,8 @@ object ElasticSearchProcessor {
   val PARAM_TIMESTAMP_FIELD = "timestampField"
 
   val DEFAULT_TIMESTAMP_FIELD = "@timestamp"
+
+  val SOURCE_URL_PREFIX = "elasticSearch:"
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

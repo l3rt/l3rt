@@ -51,14 +51,10 @@ class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer wi
     val home = Files.createTempDirectory(s"${this.getClass.getSimpleName}_home")
     logger.info(s"Test's home: $home")
     files += home
-    val config = Files.createTempFile("config", this.getClass.getSimpleName)
-    files += config
-    Files.write(config, objectMapper.writeValueAsBytes(Config(
-      1000,
-      sources = Seq(Source("test", "lert.elasticsearch.ElasticSearchProcessor", Map("host" -> "localhost", "port" -> container.mappedPort(9200).toString, "schema" -> "http"))),
-      home = home.toString
-    )))
-    Application.main(Array("--config", config.toString, "--rules", rule.toString))
+
+    System.setProperty("rules", rule.toString)
+    System.setProperty("delay", "1000")
+    Application.main(Array())
   }
 
   protected def stopApplication() = {

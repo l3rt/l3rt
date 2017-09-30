@@ -225,7 +225,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     stateProvider
   }
 
-  private def source = Source("test", "testSource", Map())
+  private def source = Source(url = "testSource")
 
   private def processorMock(messages: Seq[AlertMessage], lastSeenData: Option[LastSeenData] = None): Processor = {
     val processor = mock[Processor]
@@ -235,7 +235,7 @@ class GroovyRuleProcessorSpec extends BaseSpec {
   }
 
   private def processorLoaderMock(processor: Processor): ProcessorLoader = new ProcessorLoader(null) {
-    override def load(sourceType: String): Processor = processor
+    override def load(source: Source): Processor = processor
   }
 
   private def runRule(rule: String, delegate: RuleDelegate, stateProvider: StateProvider) = {

@@ -8,7 +8,7 @@ import javax.inject.Inject
 import com.typesafe.scalalogging.LazyLogging
 import groovy.lang.Closure
 import lert.core.ProcessorLoader
-import lert.core.config.{Config, ConfigProvider}
+import lert.core.config.{Config, ConfigOverrider, ConfigProvider}
 import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget}
 import lert.core.state.{RuleState, State, StateProvider}
 import lert.core.utils.JavaUtils
@@ -96,19 +96,21 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
     }
 
   def reaction(cl: Closure[Unit]): Unit = {
+    val config = configProvider.config
+
     reactionWasCalled = true
     require(ruleName != null && ruleName.nonEmpty, "'ruleName' is required")
+    require(config.sources != null, "Source is not specified. You need to have \"sources\" in your config")
     logger.debug(s"Start rule's reaction with [sourceName: $sourceName]")
 
     if (!skip) {
       // Explicitly called to initialize the lazy value at the proper time
       state.foreach(_ => ())
 
-      val config = configProvider.config
       val source = config.sources.find(_.name == sourceName)
         .orElse(config.sources.headOption)
         .getOrElse(throw new IllegalStateException("No sources defined"))
-      val processor = processorLoader.load(source.sourceType)
+      val processor = processorLoader.load(source)
       val preparedParams = Option(params).map(_.asScala.toMap).getOrElse(Map())
 
       val executionTime = new Date()
@@ -135,6 +137,14 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
         )
       )
     }
+  }
+
+  private implicit def customConfig: ConfigOverrider = {
+    Option(params)
+      .filter(_.containsKey("config"))
+      .map(_.get("config").asInstanceOf[util.Map[String, _]])
+      .map(ConfigOverrider)
+      .orNull
   }
 }
 

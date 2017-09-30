@@ -8,6 +8,8 @@ trait Processor {
   def loadMessages(ruleName: String, source: Source, params: Map[String, Any]): Seq[AlertMessage]
 
   def lastSeenData(ruleName: String, source: Source, params: Map[String, Any]): Option[LastSeenData]
+
+  def supports(source: Source): Boolean
 }
 
 case class AlertMessage(data: Map[String, _])

@@ -3,7 +3,7 @@ package lert
 import ch.qos.logback.classic
 import com.google.inject.{Guice, Module}
 import com.typesafe.scalalogging.LazyLogging
-import lert.Core.BASE_PACKAGE
+import lert.core.Core._
 import lert.core.TaskManager
 import lert.core.rule.ThreadAppender
 import lert.core.utils.ClosableModule
@@ -27,12 +27,7 @@ object Application extends App with LazyLogging {
       .filter(_.getPackage.getName.startsWith(BASE_PACKAGE))
       .map { c =>
         logger.info(s"Loading module: $c")
-        try {
-          c.getConstructor(classOf[Array[String]]).newInstance(args)
-        } catch {
-          case _: NoSuchMethodException =>
-            c.newInstance()
-        }
+        c.newInstance()
       }.toSeq
   }
 
@@ -42,8 +37,4 @@ object Application extends App with LazyLogging {
       .map(_.asInstanceOf[ClosableModule])
       .foreach(_.close(injector))
   }
-}
-
-object Core {
-  final val BASE_PACKAGE = "lert"
 }
