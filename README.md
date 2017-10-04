@@ -22,7 +22,7 @@ Supported outputs:
 Supported rules:
 
 * ElasticSearch: [query rule](docs/elasticsearchQueryRule.md) - free-form rule that is fully managed by ElasticSearch's `search` query
-* ElasticSearch: [count rule](docs/elasticsearchCountRule.md) - returns number of events occurred for the given period of time
+* ElasticSearch: [count rule](docs/elasticsearchCountRule.md) - returns number of events occurred for the given period of time (or multiple periods)
 * Missing yours? Add a [feature request](http://feathub.com/l3rt/l3rt) or submit a pull request 
 
 ## UI
