@@ -6,7 +6,17 @@
 
 Simple alerting application. It was inspired by elastalert and Jenkins pipelines. The goal is to provide users with more sophisticated rule system.
 
+# Why l3rt?
+
+* Zero-dependency. No additional database required.
+* Infrastructure-as-code friendly. Manage your rules as regular files
+* Infinite flexibility in rule configuration
+* Built-in web UI playground
+
+### Request a feature
+
 [![Feature Requests](http://feathub.com/l3rt/l3rt?format=svg)](http://feathub.com/l3rt/l3rt)
+
 
 Currently, l3rt supports the following sources as an input:
 

@@ -15,7 +15,7 @@ class QueryMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
   override def supports(params: Map[String, _]): Boolean =
     params.contains("query")
 
-  override def query(client: RestClient, params: Map[String, _]): Seq[AlertMessage] = {
+  override def query(ruleName: String, client: RestClient, params: Map[String, _]): Seq[AlertMessage] = {
     val query = params("query") match {
       case q: String => q
       case q: Any => objectMapper.writeValueAsString(q)

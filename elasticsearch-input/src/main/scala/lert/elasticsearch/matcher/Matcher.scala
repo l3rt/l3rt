@@ -9,5 +9,5 @@ trait Matcher {
 
   def supports(params: Map[String, _]): Boolean
 
-  def query(client: RestClient, params: Map[String, _]): Seq[AlertMessage]
+  def query(ruleName: String, client: RestClient, params: Map[String, _]): Seq[AlertMessage]
 }

@@ -27,7 +27,7 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
     val matcher = matchers.asScala.find(_.supports(params))
       .getOrElse(throw new IllegalArgumentException(s"Couldn't find a matcher for $params"))
 
-    matcher.query(restClient(source), params)
+    matcher.query(ruleName, restClient(source), params)
   }
 
   override def lastSeenData(ruleName: String, source: Source, params: Map[String, Any]): Option[LastSeenData] = {
