@@ -74,7 +74,7 @@ class CountMatcherSpec extends BaseSpec {
         |}
       """.stripMargin.getBytes))
 
-    val query = matcher.query(
+    val query = matcher.query("",
       restClient,
       Map("timeframe" -> "3 min", "filter" -> Collections.emptyMap(), "index" -> "i")
     )
