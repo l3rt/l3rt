@@ -105,7 +105,7 @@ rule {
 `./gradlew application:jar `
 
 2. Run
-`java -jar ./application/build/libs/l3rt-0.1.2.jar --config ~/conf.json --rules /opt/l3rt/rules/`
+`java -Dconfig.file=/l3rt/config/config.json -Drules=/l3rt/rules/ -jar ./application/build/libs/l3rt-0.1.2.jar`
 
 NOTE: l3rt requires >= Java 8 and Docker
 
