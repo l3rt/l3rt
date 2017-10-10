@@ -8,9 +8,11 @@ import org.scalatest.FlatSpec
 class EmailTargetSpec extends BaseSpec {
   it should "send an email" in {
     Mailbox.clearAll()
-    val emailTarget = new EmailTarget(SimpleConfigProvider(
+    implicit val config = SimpleConfigProvider(
       Config().copy(targetSettings = TargetSettings().copy(mailServer = MailServerSettings("localhost", "123", true, "test@test.com", "123")))
-    ))
+    ).conf
+
+    val emailTarget = new EmailTarget()
 
     emailTarget.send("test@gmail.com", "subj", "body")
 
