@@ -40,7 +40,7 @@ object ConfigProvider {
 class PureConfigProvider extends ConfigProvider {
   private implicit def hint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
 
-  val baseConfig: TypesafeConfig = loadConfigOrThrow[TypesafeConfig]
+  lazy val baseConfig: TypesafeConfig = loadConfigOrThrow[TypesafeConfig]
 
   override def config(implicit configOverrider: ConfigOverrider): Config =
     loadConfigWithFallbackOrThrow[Config](

@@ -10,7 +10,7 @@ class SimpleConfigProvider(val conf: Config) extends PureConfigProvider {
     registerModule(DefaultScalaModule)
     setSerializationInclusion(Include.NON_NULL)
   }
-  override val baseConfig: TypesafeConfig =
+  override lazy val baseConfig: TypesafeConfig =
     ConfigFactory.parseString(objectMapper.writeValueAsString(conf))
 }
 
