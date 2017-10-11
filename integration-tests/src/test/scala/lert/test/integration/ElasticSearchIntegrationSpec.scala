@@ -13,10 +13,11 @@ import org.apache.commons.io.FileUtils
 import org.apache.http.entity.ContentType
 import org.apache.http.nio.entity.NStringEntity
 import org.elasticsearch.client.RestClient
+import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.mutable.ListBuffer
 
-class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer with LazyLogging {
+class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer with LazyLogging with BeforeAndAfterEach {
   override val container = GenericContainer(
     "elasticsearch:2.4.4",
     command = Seq("elasticsearch", "--http.cors.enabled=true", "--script.inline=on", "--script.indexed=on", "--cluster.name=lert", "--http.cors.allow-origin=\"*\""),
@@ -55,6 +56,13 @@ class ElasticSearchIntegrationSpec extends BaseSpec with ForEachTestContainer wi
     System.setProperty("rules", rule.toString)
     System.setProperty("delay", "1000")
     Application.main(Array())
+  }
+
+
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    System.clearProperty("rules")
+    System.clearProperty("delay")
   }
 
   protected def stopApplication() = {
