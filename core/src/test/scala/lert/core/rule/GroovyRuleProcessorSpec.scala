@@ -3,8 +3,9 @@ package lert.core.rule
 import java.util.{Collections, Date}
 
 import com.google.inject.Injector
+import com.typesafe.config.{Config => TypesafeConfig}
 import groovy.lang.Closure
-import lert.core.config.{Config, ConfigProvider, SimpleConfigProvider, Source}
+import lert.core.config._
 import lert.core.processor.{AlertMessage, LastSeenData, Processor}
 import lert.core.rule.GroovyRuleProcessorSpec.RuleDelegateWithSink
 import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget}
@@ -223,6 +224,78 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     assert(stateCaptor.getValue.lastSeenTimestamp.getTime == new Date(1234).getTime)
   }
 
+  it should "handle overridden target config properly" in {
+
+    val emailTarget = mock[EmailTarget]
+    val delegate = spy(new RuleDelegateWithSink(
+      configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
+      processorLoader = processorLoaderMock(processorMock(Seq())),
+      emailTarget = emailTarget
+    ))
+
+    runRule(
+      """
+        rule {
+         ruleName = "testrule"
+         params = [
+             config: [
+                     targetSettings: [mailServer: [
+                       host: "host",
+                       port: "1234",
+                       auth: true,
+                       username: "username",
+                       password: "pass"
+                     ]]
+             ]
+          ]
+         reaction {
+           email("test@test.com", "sbj", "body")
+         }
+        }
+      """,
+      delegate,
+      stateProviderMock("testrule")
+    )
+
+    Mockito.verify(emailTarget).send("test@test.com", "sbj", "body")(
+      Config(
+        sources = Seq(source),
+        targetSettings = TargetSettings(mailServer = MailServerSettings("host", "1234", true, "username", "pass"))
+      )
+    )
+  }
+
+  it should "handle overridden source config properly" in {
+    val loader = processorLoaderMock(processorMock(Seq()))
+
+    val delegate = spy(new RuleDelegateWithSink(
+      configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
+      processorLoader = loader
+    ))
+
+    runRule(
+      """
+        rule {
+         ruleName = "testrule"
+         params = [
+             config: [
+                     sources: [
+                             ["url": "new value"]
+                     ]
+             ]
+          ]
+         reaction {
+           log("test")
+         }
+        }
+      """,
+      delegate,
+      stateProviderMock("testrule")
+    )
+
+    Mockito.verify(loader).load(Source(url = "new value"))
+  }
+
   private def stateProviderMock(rulename: String, state: Option[State] = None) = {
     val stateProvider = mock[StateProvider]
     when(stateProvider.getRuleStatus(rulename)).thenReturn(state)
@@ -238,8 +311,10 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     processor
   }
 
-  private def processorLoaderMock(processor: Processor): ProcessorLoader = new ProcessorLoader(null) {
-    override def load(source: Source): Processor = processor
+  private def processorLoaderMock(processor: Processor): ProcessorLoader = {
+    val processorLoader = mock[ProcessorLoader]
+    when(processorLoader.load(anyObject())).thenReturn(processor)
+    processorLoader
   }
 
   private def runRule(rule: String, delegate: RuleDelegate, stateProvider: StateProvider) = {
@@ -271,5 +346,4 @@ object GroovyRuleProcessorSpec {
 
     def setSink(value: Any): Unit = sink += value
   }
-
 }
