@@ -1,16 +1,14 @@
 package lert.core.rule.target
 
-import javax.inject.Inject
 import javax.mail._
 import javax.mail.internet.{InternetAddress, MimeMessage}
 
 import com.typesafe.scalalogging.LazyLogging
-import lert.core.config.ConfigProvider
+import lert.core.config.Config
 import lert.core.utils.JavaUtils
 
-class EmailTarget @Inject()(configProvider: ConfigProvider) extends LazyLogging {
-  def send(recipient: String, subject: String, body: String): Unit = {
-    val config = configProvider.config
+class EmailTarget extends LazyLogging {
+  def send(recipient: String, subject: String, body: String)(implicit config: Config): Unit = {
     require(config.targetSettings != null, "Email server settings are not specified")
 
     val properties = JavaUtils.toProperties(Map(

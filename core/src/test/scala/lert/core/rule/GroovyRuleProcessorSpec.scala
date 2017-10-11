@@ -89,9 +89,11 @@ class GroovyRuleProcessorSpec extends BaseSpec {
   it should "send message via hipchat" in {
     val processor = processorMock(Seq())
     val hipChatTarget = mock[HipChatTarget]
+    val configProvider = SimpleConfigProvider(Config(sources = Seq(source)))
+    implicit val config = configProvider.conf
     val delegate = spy(new RuleDelegateWithSink(
       hipChatTarget = hipChatTarget,
-      configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
+      configProvider = configProvider,
       processorLoader = processorLoaderMock(processor)
     ))
     runRule(
@@ -114,9 +116,11 @@ class GroovyRuleProcessorSpec extends BaseSpec {
   it should "send message via email" in {
     val processor = processorMock(Seq())
     val emailTarget = mock[EmailTarget]
+    val configProvider = SimpleConfigProvider(Config(sources = Seq(source)))
+    implicit val config = configProvider.conf
     val delegate = spy(new RuleDelegateWithSink(
       emailTarget = emailTarget,
-      configProvider = SimpleConfigProvider(Config(sources = Seq(source))),
+      configProvider = configProvider,
       processorLoader = processorLoaderMock(processor),
     ))
     runRule(

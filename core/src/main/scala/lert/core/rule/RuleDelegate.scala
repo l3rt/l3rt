@@ -31,7 +31,7 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
   var params: java.util.Map[String, _] = _
 
   @BeanProperty
-  val config: Config = configProvider.config
+  implicit lazy val config: Config = configProvider.config
 
   var stateProvider: StateProvider = _
 
@@ -96,8 +96,6 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
     }
 
   def reaction(cl: Closure[Unit]): Unit = {
-    val config = configProvider.config
-
     reactionWasCalled = true
     require(ruleName != null && ruleName.nonEmpty, "'ruleName' is required")
     require(config.sources != null, "Source is not specified. You need to have \"sources\" in your config")

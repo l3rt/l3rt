@@ -1,14 +1,11 @@
 package lert.core.rule.target
 
-import javax.inject.Inject
-
-import lert.core.config.ConfigProvider
+import lert.core.config.Config
 import lert.core.rule.target.SlackTarget.SLACK_URL
 import okhttp3._
 
-class SlackTarget @Inject()(configProvider: ConfigProvider) {
-  def send(channel: String, message: String) = {
-    val config = configProvider.config
+class SlackTarget {
+  def send(channel: String, message: String)(implicit config: Config) = {
     val client = new OkHttpClient()
     val formBody = new FormBody.Builder()
       .add("token", config.targetSettings.slack.accessToken)
