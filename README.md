@@ -99,6 +99,24 @@ rule {
 
 ## Build & Launch 
 
+### Development mode
+
+You need:
+* Java >=8
+* Node ~v8.\*.\*
+* Npm
+
+1. Launch `lert.Application` as a plain java application with optional parameters:
+* `-Dlogback.configurationFile=logback-dev.xml` - dev logger config
+* `-Dconfig.file=~/l3rt/conf.json` - specifies the config location
+* `-Drules=~/l3rt/rules/` - specifies a folder with rules if this parameter hasn't been defined in the config
+
+2. Launch client side
+* `cd ./client`
+* `npm install`
+* `npm run dev`
+* Go to http://localhost:8888
+
 ### Manually 
 
 1. Build

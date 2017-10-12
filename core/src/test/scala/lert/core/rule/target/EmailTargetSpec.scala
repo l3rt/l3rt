@@ -3,7 +3,6 @@ package lert.core.rule.target
 import lert.core.BaseSpec
 import lert.core.config._
 import org.jvnet.mock_javamail.Mailbox
-import org.scalatest.FlatSpec
 
 class EmailTargetSpec extends BaseSpec {
   it should "send an email" in {

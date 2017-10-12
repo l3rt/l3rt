@@ -4,10 +4,11 @@ import java.util
 import java.util.Collections
 
 import lert.core.BaseSpec
+import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.JavaConverters._
 
-class ConfigProviderSpec extends BaseSpec {
+class ConfigProviderSpec extends BaseSpec with BeforeAndAfterEach {
   it should "read a json config with all nested params" in {
     System.setProperty("config.file", this.getClass.getClassLoader.getResource("example-config.json").getFile)
     val provider = new PureConfigProvider()
@@ -47,5 +48,10 @@ class ConfigProviderSpec extends BaseSpec {
     assert(config.sources.head.url == "elasticSearch:http://localhost:9200")
     assert(newConfig.rules == "/newlocation")
     assert(newConfig.sources.head.url == "newValue")
+  }
+
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    System.clearProperty("config.file")
   }
 }

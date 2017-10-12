@@ -37,18 +37,10 @@ object ConfigProvider {
   private val LERT_TEMP_DIR = ".l3rt"
 }
 
-class SimpleConfigProvider(val conf: Config) extends ConfigProvider {
-  override def config(implicit configOverrider: ConfigOverrider = null) = conf
-}
-
-object SimpleConfigProvider {
-  def apply(config: Config) = new SimpleConfigProvider(config)
-}
-
 class PureConfigProvider extends ConfigProvider {
   private implicit def hint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
 
-  val baseConfig: TypesafeConfig = loadConfigOrThrow[TypesafeConfig]
+  lazy val baseConfig: TypesafeConfig = loadConfigOrThrow[TypesafeConfig]
 
   override def config(implicit configOverrider: ConfigOverrider): Config =
     loadConfigWithFallbackOrThrow[Config](
