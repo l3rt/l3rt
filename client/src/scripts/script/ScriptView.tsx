@@ -49,7 +49,8 @@ export class ScriptView extends React.Component<Props, any> {
                                            theme="tomorrow"
                                            name="codeEditor"
                                            value={this.viewStore.selectedRuleScript}
-                                           onChange={this.viewStore.updateScript}/>
+                                           onChange={this.viewStore.updateScript}
+                                           width="100%"/>
                             </Panel>
                         </div>
 
