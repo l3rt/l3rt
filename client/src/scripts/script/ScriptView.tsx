@@ -30,11 +30,7 @@ export class ScriptView extends React.Component<Props, any> {
                         <DropdownButton title={this.viewStore.selectedRuleId || 'Select a Rule'} id="scriptDropdown"
                                         onSelect={this.viewStore.selectRule}>
                             {this.viewStore.rules.map(r => <MenuItem eventKey={r} key={r.id}>{r.id}</MenuItem>)}
-                        </DropdownButton>
-
-                        <Checkbox checked={this.viewStore.mockTargets} onChange={this.viewStore.setMockTargets}>
-                            Log targets
-                        </Checkbox>&nbsp;
+                        </DropdownButton>&nbsp;
 
                         <Button onClick={this.viewStore.runScript}><FontAwesome name="play"/></Button>&nbsp;
                         <Button onClick={this.viewStore.saveDialog}><FontAwesome name="save"/></Button>
@@ -49,8 +45,12 @@ export class ScriptView extends React.Component<Props, any> {
                                            theme="tomorrow"
                                            name="codeEditor"
                                            value={this.viewStore.selectedRuleScript}
-                                           onChange={this.viewStore.updateScript}/>
+                                           onChange={this.viewStore.updateScript}
+                                           width="100%"/>
                             </Panel>
+                            <Checkbox checked={this.viewStore.mockTargets} onChange={this.viewStore.setMockTargets}>
+                                Use sandbox (real messages won't be sent)
+                            </Checkbox>
                         </div>
 
                         <div className="col-md-6">

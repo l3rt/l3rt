@@ -13,7 +13,8 @@ case class Source(name: Option[String] = None, url: String, params: Option[Map[S
 
 case class TargetSettings(hipchat: HipchatSettings = null,
                           mailServer: MailServerSettings = null,
-                          slack: SlackSettings = null)
+                          slack: SlackSettings = null,
+                          jira: JiraSettings = null)
 
 case class HipchatSettings(accessToken: String, baseUrl: String)
 
@@ -24,3 +25,5 @@ case class MailServerSettings(host: String,
                               auth: Boolean,
                               username: String,
                               password: String)
+
+case class JiraSettings(url: String, username: String, password: String)
