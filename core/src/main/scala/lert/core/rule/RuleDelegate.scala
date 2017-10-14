@@ -9,7 +9,7 @@ import com.typesafe.scalalogging.LazyLogging
 import groovy.lang.Closure
 import lert.core.ProcessorLoader
 import lert.core.config.{Config, ConfigOverrider, ConfigProvider}
-import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget}
+import lert.core.rule.target.{EmailTarget, HipChatTarget, JiraTarget, SlackTarget}
 import lert.core.state.{RuleState, State, StateProvider}
 import lert.core.utils.JavaUtils
 
@@ -19,6 +19,7 @@ import scala.collection.JavaConverters._
 class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
                              emailTarget: EmailTarget,
                              slackTarget: SlackTarget,
+                             jiraTarget: JiraTarget,
                              configProvider: ConfigProvider,
                              processorLoader: ProcessorLoader) extends LazyLogging {
   @BeanProperty
@@ -93,6 +94,13 @@ class RuleDelegate @Inject()(hipChatTarget: HipChatTarget,
       logger.info(s"Slack: channel=$channel message=$message")
     } else {
       slackTarget.send(channel, message)
+    }
+
+  def jira(project: String, summary: String, description: String, issueType: String): Unit =
+    if (mockTargets) {
+      logger.info(s"Jira: project=$project summary=$summary body=$description issueType=$issueType")
+    } else {
+      jiraTarget.send(project, summary, description, issueType)
     }
 
   def reaction(cl: Closure[Unit]): Unit = {

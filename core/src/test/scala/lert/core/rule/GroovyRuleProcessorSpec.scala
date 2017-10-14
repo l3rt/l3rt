@@ -3,12 +3,11 @@ package lert.core.rule
 import java.util.{Collections, Date}
 
 import com.google.inject.Injector
-import com.typesafe.config.{Config => TypesafeConfig}
 import groovy.lang.Closure
 import lert.core.config._
 import lert.core.processor.{AlertMessage, LastSeenData, Processor}
 import lert.core.rule.GroovyRuleProcessorSpec.RuleDelegateWithSink
-import lert.core.rule.target.{EmailTarget, HipChatTarget, SlackTarget}
+import lert.core.rule.target.{EmailTarget, HipChatTarget, JiraTarget, SlackTarget}
 import lert.core.state.{RuleState, State, StateProvider}
 import lert.core.{BaseSpec, ProcessorLoader}
 import org.mockito.Matchers._
@@ -139,6 +138,33 @@ class GroovyRuleProcessorSpec extends BaseSpec {
     )
 
     verify(emailTarget).send("recipient", "subj", "body")
+  }
+
+  it should "send message via Jira" in {
+    val processor = processorMock(Seq())
+    val jiraTarget = mock[JiraTarget]
+    val configProvider = SimpleConfigProvider(Config(sources = Seq(source)))
+    implicit val config = configProvider.conf
+    val delegate = spy(new RuleDelegateWithSink(
+      jiraTarget = jiraTarget,
+      configProvider = configProvider,
+      processorLoader = processorLoaderMock(processor),
+    ))
+    runRule(
+      """
+        |rule {
+        | ruleName = "testrule"
+        | reaction {
+        |   jira("projectCode", "summary", "description", "bug")
+        | }
+        |}
+      """.
+        stripMargin,
+      delegate,
+      stateProviderMock("testrule")
+    )
+
+    verify(jiraTarget).send("projectCode", "summary", "description", "bug")
   }
 
   it should "load last status" in {
@@ -333,11 +359,13 @@ object GroovyRuleProcessorSpec {
   class RuleDelegateWithSink(hipChatTarget: HipChatTarget = null,
                              emailTarget: EmailTarget = null,
                              slackTarget: SlackTarget = null,
+                             jiraTarget: JiraTarget = null,
                              configProvider: ConfigProvider = null,
                              processorLoader: ProcessorLoader = null) extends RuleDelegate(
     hipChatTarget,
     emailTarget,
     slackTarget,
+    jiraTarget,
     configProvider,
     processorLoader
   ) {
