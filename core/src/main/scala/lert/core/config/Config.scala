@@ -26,4 +26,4 @@ case class MailServerSettings(host: String,
                               username: String,
                               password: String)
 
-case class JiraSettings(url: String, token: String)
+case class JiraSettings(url: String, username: String, password: String)
