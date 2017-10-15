@@ -27,6 +27,7 @@ Supported outputs:
 * [Email](docs/mailTarget.md)
 * [Hipchat](docs/hipchatTarget.md)
 * [Slack](docs/slackTarget.md)
+* [Jira](docs/jiraTarget.md)
 * Missing yours? Add a [feature request](http://feathub.com/l3rt/l3rt) or submit a pull request 
 
 Supported rules:
