@@ -1,39 +1,33 @@
 package lert.core.rule.target
 
-import java.util.Base64
-
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.inject.Inject
 import lert.core.config.Config
+import lert.core.rule.target.JiraTarget._
+import lert.core.utils.HttpUtils
 import okhttp3._
 
-class JiraTarget {
+class JiraTarget @Inject()(objectMapper: ObjectMapper) {
+  lazy val client = new OkHttpClient()
+
   def send(project: String, summary: String, description: String, issueType: String)(implicit config: Config): Unit = {
-    val client = new OkHttpClient()
-    val jsonType = MediaType.parse("application/json; charset=utf-8")
-    val bodyStr =
-      s"""
-         |{
-         |    "fields": {
-         |       "project":
-         |       {
-         |          "key": "$project"
-         |       },
-         |       "summary": "$summary",
-         |       "description": "$description",
-         |       "issuetype": {
-         |          "name": "$issueType"
-         |       }
-         |   }
-         |}
-      """.stripMargin
-    val formBody = RequestBody.create(jsonType, bodyStr)
-    val jiraSettings = config.targetSettings.jira
-    val jiraUrl = jiraSettings.url
-    val authString = new String(Base64.getEncoder.encode(s"${jiraSettings.username}:${jiraSettings.password}".getBytes))
-    val request = new Request.Builder().url(s"$jiraUrl/rest/api/2/issue").header("Authorization", s"Basic $authString").post(formBody).build()
+    val settings = config.targetSettings.jira
+
+    val formBody = RequestBody.create(JSON_MEDIA_TYPE, objectMapper.writeValueAsBytes(Issue(
+      Fields(
+        Project(project),
+        summary,
+        description,
+        IssueType(issueType)
+      )
+    )))
+
+    val baseUrl = settings.url + (if (settings.url.endsWith("/")) "" else "/") + "rest/api/2/issue"
+    val request = new Request.Builder().url(baseUrl).header("Authorization", s"Basic ${HttpUtils.basicAuth(settings.username, settings.password)}").post(formBody).build()
     val response = client.newCall(request).execute()
     if (response.code() > 299) {
       try {
-        throw new RuntimeException(response.body().string())
+        throw new RuntimeException(s"Couldn't process Jira REST call due to: ${response.body().string()}")
       } finally {
         response.body().close()
       }
@@ -41,4 +35,15 @@ class JiraTarget {
   }
 }
 
+object JiraTarget {
+  final val JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8")
 
+  case class Issue(fields: Fields)
+
+  case class Fields(project: Project, summary: String, description: String, issuetype: IssueType)
+
+  case class Project(key: String)
+
+  case class IssueType(name: String)
+
+}

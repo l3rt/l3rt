@@ -27,10 +27,12 @@ Supported outputs:
 * [Email](docs/mailTarget.md)
 * [Hipchat](docs/hipchatTarget.md)
 * [Slack](docs/slackTarget.md)
+* [Jira](docs/jiraTarget.md)
 * Missing yours? Add a [feature request](http://feathub.com/l3rt/l3rt) or submit a pull request 
 
 Supported rules:
 
+* ElasticSearch: [queryString rule](docs/elasticsearchQueryStringRule.md) - returns messages matched by a [query string](https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-query-string-query.html)
 * ElasticSearch: [query rule](docs/elasticsearchQueryRule.md) - free-form rule that is fully managed by ElasticSearch's `search` query
 * ElasticSearch: [count rule](docs/elasticsearchCountRule.md) - returns number of events occurred for the given period of time (or multiple periods)
 * Missing yours? Add a [feature request](http://feathub.com/l3rt/l3rt) or submit a pull request 
@@ -72,16 +74,8 @@ Create your rule. All rules are groovy based DSLs, so you can use all power of g
 rule {
     ruleName = "myTestRule"
     params = [
-            "index": "logstash-*",
-            "query": [query: [
-                            bool: [
-                                must: [
-                                        ["range": ["@timestamp": ["gt": lastSeenTimestamp]]],
-                                        ["match": [ "message": "error" ]]
-                                    ]
-                                ]
-                             ]
-                        ]
+            index: "logstash-*",
+            queryString: "message:Error"
     ]
 
     reaction { messages ->
