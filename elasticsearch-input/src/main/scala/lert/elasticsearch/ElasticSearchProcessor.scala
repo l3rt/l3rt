@@ -31,17 +31,18 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
   }
 
   override def lastSeenData(ruleName: String, source: Source, params: Map[String, Any]): Option[LastSeenData] = {
+    //s"/${getIndexName(params)}/_search",
     val record = restClient(source)
       .performRequest(
         "GET",
-        s"/${getIndexName(params)}/_search",
+        "/",
         Collections.emptyMap[String, String](),
         httpEntity(Map(
           "query" -> Map("match_all" -> Map()),
           "size" -> 1,
           "sort" -> Seq(Map(getTimestampField(params) -> Map("order" -> "desc")))
         ))
-      ).getEntity.to[Response].hits.hits.headOption
+      ).to[Response].hits.hits.headOption
 
     record.map { v =>
       val timestamp = v._source(getTimestampField(params)).toString
@@ -50,12 +51,12 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
     }
   }
 
-  protected def restClient(source: Source): RestClient = {
+  protected def restClient(source: Source): RestClientWrapper = {
     val url = new URI(source.url.substring(SOURCE_URL_PREFIX.length))
     cache.get(
       "elasticRestClient",
       source,
-      RestClient.builder(new HttpHost(url.getHost, url.getPort, url.getScheme)).build()
+      new RestClientWrapper(source, RestClient.builder(new HttpHost(url.getHost, url.getPort, url.getScheme)).build())
     )
   }
 
