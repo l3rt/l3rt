@@ -10,7 +10,9 @@ import scala.util.Try
 
 class ConfigDocumentation extends BaseSpec {
   it should "generate config docs" in {
-    ConfigDocumentation.main(Array())
+    if (System.getenv("SKIP_DOC_GENERATION") == null) {
+      ConfigDocumentation.main(Array())
+    }
   }
 }
 
@@ -18,12 +20,18 @@ object ConfigDocumentation extends App {
   val sb = new StringBuilder
   generateForClass(classOf[Config], sb, 0)
 
-  Files.write(Paths.get("./docs/config.md"),
-    s"""
-       |# Configuration
-       |
+  Seq("./docs/config.md", "../docs/config.md")
+    .map(Paths.get(_))
+    .find(Files.exists(_))
+    .foreach { p =>
+      Files.write(p,
+        s"""
+           |# Configuration
+           |
       |${sb.toString()}
     """.stripMargin.getBytes)
+      println("Done!!!")
+    }
 
   def generateForClass(cls: Class[_], sb: StringBuilder, level: Int): Unit = {
     cls.getDeclaredFields.foreach { f =>
