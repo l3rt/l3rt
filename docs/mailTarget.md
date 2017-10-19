@@ -2,17 +2,7 @@
 
 ## Configuration
 
-The following configuration should be added to `targetSettings` object in your config:
-
-```json
-        "mailServer": {
-          "host": "smtp.gmail.com",
-          "port": "465",
-          "auth":  true,
-          "username": "myemail@test.com",
-          "password": "password"
-        }
-```
+See [config.md](./config.md)
 
 ## Usage
 

@@ -2,16 +2,7 @@
 
 ## Configuration
 
-The following configuration should be added to `targetSettings` object in your config:
-
-```json
-        "hipchat": {
-           "accessToken": "...",
-           "baseUrl": "https://api.hipchat.com/v2/"
-        }
-```
-
-
+See [config.md](./config.md)
 
 ## Usage
 

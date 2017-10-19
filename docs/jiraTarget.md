@@ -2,17 +2,7 @@
 
 ## Configuration
 
-The fsummaryg configuration should be added to `targetSettings` object in your config:
-
-```json
-        "jira": {
-            "url"     : "http://jira.mycompany/",
-            "username": "test",
-            "password": "test"
-       }
-```
-
-
+See [config.md](./config.md)
 
 ## Usage
 

@@ -2,13 +2,7 @@
 
 ## Configuration
 
-The following configuration should be added to `targetSettings` object in your config:
-
-```json
-        "slack": {
-          "accessToken": ""
-        }
-```
+See [config.md](./config.md)
 
 ## Usage
 
