@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import lert.core.processor.AlertMessage
 import lert.core.state.StateProvider
 import lert.elasticsearch.ElasticSearchProcessorUtils._
-import lert.elasticsearch.{Response, RestClientWrapper}
+import lert.elasticsearch.{CustomRestClient, Response}
 import org.apache.http.entity.ContentType
 import org.apache.http.nio.entity.NStringEntity
 
@@ -15,7 +15,7 @@ class QueryStringMatcher @Inject()(implicit objectMapper: ObjectMapper, statePro
   override def supports(params: Map[String, _]): Boolean =
     params.contains("queryString")
 
-  override def query(ruleName: String, client: RestClientWrapper, params: Map[String, _]): Seq[AlertMessage] = {
+  override def query(ruleName: String, client: CustomRestClient, params: Map[String, _]): Seq[AlertMessage] = {
     val lastSeenTimestamp = stateProvider.getRuleStatus(ruleName).map(_.lastSeenTimestamp).getOrElse(new Date())
 
     val query = Map(

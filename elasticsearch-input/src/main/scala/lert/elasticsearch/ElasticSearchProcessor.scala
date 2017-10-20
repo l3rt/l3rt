@@ -16,8 +16,6 @@ import lert.core.processor.{AlertMessage, LastSeenData, Processor}
 import lert.elasticsearch.ElasticSearchProcessor._
 import lert.elasticsearch.ElasticSearchProcessorUtils._
 import lert.elasticsearch.matcher.Matcher
-import org.apache.http.HttpHost
-import org.elasticsearch.client.RestClient
 
 class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
                                        cache: GlobalCache,
@@ -31,11 +29,10 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
   }
 
   override def lastSeenData(ruleName: String, source: Source, params: Map[String, Any]): Option[LastSeenData] = {
-    //s"/${getIndexName(params)}/_search",
     val record = restClient(source)
       .performRequest(
         "GET",
-        "/",
+        s"/${getIndexName(params)}/_search",
         Collections.emptyMap[String, String](),
         httpEntity(Map(
           "query" -> Map("match_all" -> Map()),
@@ -51,12 +48,12 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
     }
   }
 
-  protected def restClient(source: Source): RestClientWrapper = {
+  protected def restClient(source: Source): CustomRestClient = {
     val url = new URI(source.url.substring(SOURCE_URL_PREFIX.length))
     cache.get(
       "elasticRestClient",
       source,
-      new RestClientWrapper(source, RestClient.builder(new HttpHost(url.getHost, url.getPort, url.getScheme)).build())
+      CustomRestClient(source)
     )
   }
 
