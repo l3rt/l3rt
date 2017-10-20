@@ -1,5 +1,6 @@
- dependencies {
+dependencies {
     compile project(":core")
-    compile ("org.elasticsearch.client:rest:$elasticsearchClientVersion")
+    compile("org.elasticsearch.client:rest:$elasticsearchClientVersion")
+    compile("com.amazonaws:aws-java-sdk-core:1.11.214")
     testCompile project(":core").sourceSets.test.output
 }

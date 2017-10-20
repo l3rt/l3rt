@@ -1,7 +1,13 @@
 {
   "sources": [
     {
-      "url": "elasticSearch:http://localhost:9200"
+      "url": "elasticSearch:http://localhost:9200",
+      "params": {
+        "isAws": "true",
+        "awsRegion": "your region",
+        "awsAccessKey": "your access key id",
+        "awsSecretKey": "your secrey access key"
+      }
     }
   ],
   "rules": "/lert/rules/",

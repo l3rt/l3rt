@@ -16,8 +16,6 @@ import lert.core.processor.{AlertMessage, LastSeenData, Processor}
 import lert.elasticsearch.ElasticSearchProcessor._
 import lert.elasticsearch.ElasticSearchProcessorUtils._
 import lert.elasticsearch.matcher.Matcher
-import org.apache.http.HttpHost
-import org.elasticsearch.client.RestClient
 
 class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
                                        cache: GlobalCache,
@@ -41,7 +39,7 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
           "size" -> 1,
           "sort" -> Seq(Map(getTimestampField(params) -> Map("order" -> "desc")))
         ))
-      ).getEntity.to[Response].hits.hits.headOption
+      ).to[Response].hits.hits.headOption
 
     record.map { v =>
       val timestamp = v._source(getTimestampField(params)).toString
@@ -50,12 +48,12 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
     }
   }
 
-  protected def restClient(source: Source): RestClient = {
+  protected def restClient(source: Source): CustomRestClient = {
     val url = new URI(source.url.substring(SOURCE_URL_PREFIX.length))
     cache.get(
       "elasticRestClient",
       source,
-      RestClient.builder(new HttpHost(url.getHost, url.getPort, url.getScheme)).build()
+      CustomRestClient(source)
     )
   }
 

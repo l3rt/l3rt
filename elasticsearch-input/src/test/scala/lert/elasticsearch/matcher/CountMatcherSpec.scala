@@ -5,11 +5,11 @@ import java.util
 import java.util.{Collections, Date}
 
 import scala.concurrent.duration.Duration
-
 import lert.core.BaseSpec
 import lert.core.processor.AlertMessage
-import org.apache.http.HttpEntity
-import org.elasticsearch.client.{Response, RestClient}
+import lert.elasticsearch.{CustomRestClient, ElasticJsonResponse}
+import lert.elasticsearch.ElasticSearchProcessorUtils._
+import org.apache.http.{Header, HttpEntity}
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar._
@@ -28,16 +28,15 @@ class CountMatcherSpec extends BaseSpec {
 
   it should "send a valid query to elastic" in {
     val matcher = new CountMatcher()(objectMapper)
-    val restClient = mock[RestClient]
-    val httpEntity = mock[HttpEntity]
-    val response = mock[Response]
+    val restClientWrapper = mock[CustomRestClient]
+    val elasticJsonResponse = mock[ElasticJsonResponse]
 
-    when(restClient.performRequest(anyObject[String](),
+    when(restClientWrapper.performRequest(anyObject[String](),
       anyObject[String](),
       anyObject[util.Map[String, String]](),
-      anyObject[HttpEntity]())).thenReturn(response)
-    when(response.getEntity).thenReturn(httpEntity)
-    when(httpEntity.getContent).thenReturn(new ByteArrayInputStream(
+      anyObject[HttpEntity](),
+      anyObject[Header]())).thenReturn(elasticJsonResponse)
+    when(elasticJsonResponse.json).thenReturn(convertInputStreamToStringAndClose(new ByteArrayInputStream(
       """
         |{
         |  "took" : 5,
@@ -72,10 +71,10 @@ class CountMatcherSpec extends BaseSpec {
         |    }
         |  }
         |}
-      """.stripMargin.getBytes))
+      """.stripMargin.getBytes)))
 
     val query = matcher.query("",
-      restClient,
+      restClientWrapper,
       Map("timeframe" -> "3 min", "filter" -> Collections.emptyMap(), "index" -> "i")
     )
     assert(query == Seq(

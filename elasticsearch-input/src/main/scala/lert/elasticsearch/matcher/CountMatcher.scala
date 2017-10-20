@@ -8,10 +8,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.LazyLogging
 import lert.core.processor.AlertMessage
-import lert.elasticsearch.ElasticSearchProcessor
+import lert.elasticsearch.{CustomRestClient, ElasticSearchProcessor}
 import lert.elasticsearch.ElasticSearchProcessorUtils._
 import lert.elasticsearch.matcher.CountMatcher._
-import org.elasticsearch.client.RestClient
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
@@ -21,7 +20,7 @@ class CountMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
     params.contains(MATCHER_PARAMETER) && params(MATCHER_PARAMETER).toString.toLowerCase == "count"
   }
 
-  override def query(ruleName: String, client: RestClient, params: Map[String, _]): Seq[AlertMessage] = {
+  override def query(ruleName: String, client: CustomRestClient, params: Map[String, _]): Seq[AlertMessage] = {
     require(params.contains(TIMEFRAME_PARAMETER), s"$TIMEFRAME_PARAMETER is not defined in $params")
     require(params.contains(FILTER_PARAMETER), s"$FILTER_PARAMETER is not defined in $params")
 
@@ -41,7 +40,7 @@ class CountMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
       s"/${getIndexName(params)}/_search",
       Collections.emptyMap[String, String](),
       httpEntity(query)
-    ).getEntity.to[Response]
+    ).to[Response]
 
     Option(response.aggregations).map(_.range.buckets) match {
 
