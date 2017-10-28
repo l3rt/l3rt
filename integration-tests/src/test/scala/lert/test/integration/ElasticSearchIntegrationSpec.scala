@@ -7,7 +7,6 @@ import com.dimafeng.testcontainers.{ForEachTestContainer, GenericContainer}
 import com.typesafe.scalalogging.LazyLogging
 import lert.Application
 import lert.core.BaseSpec
-import lert.core.config.{Config, Source}
 import lert.elasticsearch.ElasticSearchProcessor
 import org.apache.commons.io.FileUtils
 import org.apache.http.entity.ContentType

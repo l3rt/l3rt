@@ -7,8 +7,7 @@ import java.util.{Collections, Date}
 import scala.concurrent.duration.Duration
 import lert.core.BaseSpec
 import lert.core.processor.AlertMessage
-import lert.elasticsearch.{CustomRestClient, ElasticJsonResponse}
-import lert.elasticsearch.ElasticSearchProcessorUtils._
+import lert.elasticsearch.restclient.{Response, RestClient}
 import org.apache.http.{Header, HttpEntity}
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
@@ -28,15 +27,15 @@ class CountMatcherSpec extends BaseSpec {
 
   it should "send a valid query to elastic" in {
     val matcher = new CountMatcher()(objectMapper)
-    val restClientWrapper = mock[CustomRestClient]
-    val elasticJsonResponse = mock[ElasticJsonResponse]
+    val restClientWrapper = mock[RestClient]
+    val elasticJsonResponse = mock[Response]
 
     when(restClientWrapper.performRequest(anyObject[String](),
       anyObject[String](),
-      anyObject[util.Map[String, String]](),
+      anyObject[Map[String, String]](),
       anyObject[HttpEntity](),
       anyObject[Header]())).thenReturn(elasticJsonResponse)
-    when(elasticJsonResponse.json).thenReturn(convertInputStreamToStringAndClose(new ByteArrayInputStream(
+    when(elasticJsonResponse.body).thenReturn(
       """
         |{
         |  "took" : 5,
@@ -71,7 +70,7 @@ class CountMatcherSpec extends BaseSpec {
         |    }
         |  }
         |}
-      """.stripMargin.getBytes)))
+      """.stripMargin.getBytes)
 
     val query = matcher.query("",
       restClientWrapper,

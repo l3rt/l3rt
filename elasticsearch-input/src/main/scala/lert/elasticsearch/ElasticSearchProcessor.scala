@@ -1,12 +1,10 @@
 package lert.elasticsearch
 
-import java.net.URI
 import java.text.SimpleDateFormat
 import java.util
-import java.util.{Collections, TimeZone}
+import java.util.TimeZone
 import javax.inject.Inject
 
-import scala.collection.JavaConverters._
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.LazyLogging
@@ -16,6 +14,9 @@ import lert.core.processor.{AlertMessage, LastSeenData, Processor}
 import lert.elasticsearch.ElasticSearchProcessor._
 import lert.elasticsearch.ElasticSearchProcessorUtils._
 import lert.elasticsearch.matcher.Matcher
+import lert.elasticsearch.restclient.RestClient
+
+import scala.collection.JavaConverters._
 
 class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
                                        cache: GlobalCache,
@@ -33,7 +34,7 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
       .performRequest(
         "GET",
         s"/${getIndexName(params)}/_search",
-        Collections.emptyMap[String, String](),
+        Map(),
         httpEntity(Map(
           "query" -> Map("match_all" -> Map()),
           "size" -> 1,
@@ -48,12 +49,11 @@ class ElasticSearchProcessor @Inject()(implicit objectMapper: ObjectMapper,
     }
   }
 
-  protected def restClient(source: Source): CustomRestClient = {
-    val url = new URI(source.url.substring(SOURCE_URL_PREFIX.length))
+  protected def restClient(source: Source): RestClient = {
     cache.get(
       "elasticRestClient",
       source,
-      CustomRestClient(source)
+      RestClient(source)
     )
   }
 

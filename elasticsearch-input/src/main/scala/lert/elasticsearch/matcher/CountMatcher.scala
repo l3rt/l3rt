@@ -1,16 +1,17 @@
 package lert.elasticsearch.matcher
 
 import java.util
-import java.util.{Collections, Date}
+import java.util.Date
 import javax.inject.Inject
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.LazyLogging
 import lert.core.processor.AlertMessage
-import lert.elasticsearch.{CustomRestClient, ElasticSearchProcessor}
+import lert.elasticsearch.ElasticSearchProcessor
 import lert.elasticsearch.ElasticSearchProcessorUtils._
 import lert.elasticsearch.matcher.CountMatcher._
+import lert.elasticsearch.restclient.RestClient
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
@@ -20,7 +21,7 @@ class CountMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
     params.contains(MATCHER_PARAMETER) && params(MATCHER_PARAMETER).toString.toLowerCase == "count"
   }
 
-  override def query(ruleName: String, client: CustomRestClient, params: Map[String, _]): Seq[AlertMessage] = {
+  override def query(ruleName: String, client: RestClient, params: Map[String, _]): Seq[AlertMessage] = {
     require(params.contains(TIMEFRAME_PARAMETER), s"$TIMEFRAME_PARAMETER is not defined in $params")
     require(params.contains(FILTER_PARAMETER), s"$FILTER_PARAMETER is not defined in $params")
 
@@ -38,7 +39,7 @@ class CountMatcher @Inject()(implicit objectMapper: ObjectMapper) extends Matche
     val response = client.performRequest(
       "GET",
       s"/${getIndexName(params)}/_search",
-      Collections.emptyMap[String, String](),
+      Map(),
       httpEntity(query)
     ).to[Response]
 
