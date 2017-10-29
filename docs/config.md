@@ -6,7 +6,11 @@
 * `sources` (Seq) - Sources 
 	* `name` (Option) - Should uniquely specified in case of multiple sources 
 	* `url` (String) - Connection url (e.g. elasticSearch:http://localhost:9200) 
-	* `params` (Option) -  
+	* `params` (Option) - Optional parameters
+		* AWS 
+			* `awsRegion` 
+			* `awsAccessKey` 
+			* `awsSecretKey` 
 * `targetSettings` (TargetSettings) - Target specific settings (shared with all rules) 
 	* `hipchat` (HipchatSettings) - HipChat settings 
 		* `accessToken` (String) - Access token https://developer.atlassian.com/hipchat/guide/hipchat-rest-api 

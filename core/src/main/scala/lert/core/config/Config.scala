@@ -20,6 +20,7 @@ case class Source(@(Description@field)("Should uniquely specified in case of mul
                   name: Option[String] = None,
                   @(Description@field)("Connection url (e.g. elasticSearch:http://localhost:9200)")
                   url: String,
+                  @(Description@field)("Optional parameters\n\t\t* AWS \n\t\t\t* `awsRegion` \n\t\t\t* `awsAccessKey` \n\t\t\t* `awsSecretKey`")
                   params: Option[Map[String, String]] = None)
 
 case class TargetSettings(@(Description@field)("HipChat settings")

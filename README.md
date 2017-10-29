@@ -21,6 +21,7 @@ Simple alerting application. It was inspired by elastalert and Jenkins pipelines
 Currently, l3rt supports the following sources as an input:
 
 * ElasticSearch
+* [AWS ElasticSearch](docs/awsElasticSearch.md)
 
 Supported outputs:
 
