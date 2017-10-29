@@ -9,6 +9,7 @@ import lert.core.BaseSpec
 import lert.core.processor.AlertMessage
 import lert.elasticsearch.restclient.{Response, RestClient}
 import org.apache.http.{Header, HttpEntity}
+import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar._
@@ -28,14 +29,7 @@ class CountMatcherSpec extends BaseSpec {
   it should "send a valid query to elastic" in {
     val matcher = new CountMatcher()(objectMapper)
     val restClientWrapper = mock[RestClient]
-    val elasticJsonResponse = mock[Response]
-
-    when(restClientWrapper.performRequest(anyObject[String](),
-      anyObject[String](),
-      anyObject[Map[String, String]](),
-      anyObject[HttpEntity](),
-      anyObject[Header]())).thenReturn(elasticJsonResponse)
-    when(elasticJsonResponse.body).thenReturn(
+    val response = Response(
       """
         |{
         |  "took" : 5,
@@ -70,7 +64,13 @@ class CountMatcherSpec extends BaseSpec {
         |    }
         |  }
         |}
-      """.stripMargin.getBytes)
+      """.stripMargin.getBytes, 200)
+
+    when(restClientWrapper.performRequest(anyObject[String](),
+      anyObject[String](),
+      Matchers.eq(Map[String, String]()),
+      anyObject[HttpEntity](),
+      anyObject[Header]())).thenReturn(response)
 
     val query = matcher.query("",
       restClientWrapper,
